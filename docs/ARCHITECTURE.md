@@ -195,6 +195,10 @@ flowchart LR
 
 The API-backed `CaseService` now reads and creates cases through `/api/cases`. `CaseApplicationService` aggregates persisted relational rows into `CaseDetail`; route components remain unaware of SQLite and API handlers remain unaware of UI composition.
 
+## Deterministic verification (Phase 5)
+
+The selected case follows `Route → CaseService → API → CaseApplicationService → SQLite → CaseDetail`. The case API invokes `VerificationService`, which reads persisted synthetic document records, evaluates `AREA_CONSISTENCY` and `FAMILY_CONTEXT` without an LLM, replaces the case's verification snapshot, and returns it through `CaseDetail.verification`. Each result retains its source document IDs and compared values. Extraction can assist later fact preparation, but it never decides the verification outcome; absent comparable facts become `INSUFFICIENT_EVIDENCE`.
+
 ## Testing strategy
 
 - **Unit (Vitest):** normalizers, identifier/area comparisons, rule registry, guidance mapping, schema validation, watermark assertions.

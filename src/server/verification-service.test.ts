@@ -1,0 +1,7 @@
+import { describe, expect, it } from "vitest";
+import { verificationService } from "@/server/verification-service";
+describe("deterministic verification", () => {
+  it("finds hero area and family-context potential discrepancies with source traceability", () => { const results = verificationService.run("demo-family-001")!; const area = results.find((item) => item.ruleId === "AREA_CONSISTENCY"); const family = results.find((item) => item.ruleId === "FAMILY_CONTEXT"); expect(area).toMatchObject({ outcome: "POTENTIAL_ISSUE", status: "warning", expectedValue: "1.20 acre", observedValue: "1.02 acre" }); expect(area?.sourceDocumentIds).toEqual(["demo-family-001-historical", "demo-family-001-survey"]); expect(family).toMatchObject({ outcome: "POTENTIAL_ISSUE", status: "warning", expectedValue: "Synthetic Child B 001", observedValue: "Synthetic Child A 001" }); });
+  it("keeps the control case free of hero potential discrepancies when evidence is absent", () => { const results = verificationService.run("demo-family-002")!; expect(results.some((item) => item.outcome === "POTENTIAL_ISSUE")).toBe(false); expect(results.every((item) => item.outcome === "INSUFFICIENT_EVIDENCE")).toBe(true); });
+  it("is deterministic and persists results", () => { const first = verificationService.run("demo-family-001"); expect(verificationService.run("demo-family-001")).toEqual(first); expect(verificationService.list("demo-family-001")).toEqual(first); });
+});

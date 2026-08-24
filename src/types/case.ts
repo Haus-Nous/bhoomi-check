@@ -17,7 +17,21 @@ export type ExtractedDocument = { documentType?: string; facts: ExtractionFact[]
 export type DocumentExtraction = { id: string; caseId: string; documentId: string; status: "completed" | "failed"; result?: ExtractedDocument; provider?: string; model?: string; createdAt: string; error?: { code: string; message: string } };
 export type DocumentItem = { id: string; title: string; kind: DocumentKind; type: string; addedLabel: string; state: DocumentProcessingStatus; fields: ExtractedField[]; sourceText: string; isSynthetic: true };
 export type SyntheticDocumentFixture = { id: string; title: string; kind: DocumentKind; type: string; sourceText: string; isSynthetic: true };
-export type VerificationItem = { id: string; title: string; detail: string; status: VerificationStatus; confidence: number; evidence: string };
+export type VerificationOutcome = "PASS" | "POTENTIAL_ISSUE" | "INSUFFICIENT_EVIDENCE";
+export type VerificationRuleId = "AREA_CONSISTENCY" | "FAMILY_CONTEXT";
+export type VerificationItem = {
+  id: string;
+  ruleId: VerificationRuleId;
+  outcome: VerificationOutcome;
+  title: string;
+  detail: string;
+  status: VerificationStatus;
+  confidence: number;
+  evidence: string;
+  sourceDocumentIds: string[];
+  expectedValue?: string;
+  observedValue?: string;
+};
 export type SurveyRecord = { recordedName: string; khata: string; khesra?: string; area: { value: number; unit: "acres" }; surveyStage: string; mapReference: string };
 export type GuidanceAction = { id: string; title: string; detail: string };
 export type NextAction = { recommendedTitle: string; recommendedDetail: string; steps: string[]; options: GuidanceAction[] };
