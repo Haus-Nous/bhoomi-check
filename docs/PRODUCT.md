@@ -41,6 +41,10 @@ Secondary demo user: a legal-aid volunteer or community facilitator using the ca
 - **Plain language:** show the source terminology and an understandable explanation side by side. Begin bilingual support with English plus simple Hindi labels/content; do not claim certified translations.
 - **Safety by design:** persistent prototype/synthetic/non-legal notices and no real government integrations.
 
+## Citizen-facing verification experience
+
+The verification screen explains what BhoomiCheck compared in the available synthetic records. A pass means no obvious discrepancy was found in the records selected for that check; a potential issue means the records contain values or family/holder context that differ; insufficient evidence means the required comparable information is not available. Every potential issue displays its deterministic rule, compared values, source-document references, and a concise explanation of why it was flagged. None of these states establishes legal ownership, record correctness, fraud, mutation validity, or official verification.
+
 ## Demo scenario and acceptance criteria
 
 Ship one polished seeded scenario, such as an inherited parcel where a legacy record uses a parent name, the family narrative contains a spelling variant, and the synthetic survey record has a different area or omitted heir. Seed multiple controlled variants only if time permits.

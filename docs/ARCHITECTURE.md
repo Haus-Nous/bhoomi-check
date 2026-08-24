@@ -199,6 +199,10 @@ The API-backed `CaseService` now reads and creates cases through `/api/cases`. `
 
 The selected case follows `Route → CaseService → API → CaseApplicationService → SQLite → CaseDetail`. The case API invokes `VerificationService`, which reads persisted synthetic document records, evaluates `AREA_CONSISTENCY` and `FAMILY_CONTEXT` without an LLM, replaces the case's verification snapshot, and returns it through `CaseDetail.verification`. Each result retains its source document IDs and compared values. Extraction can assist later fact preparation, but it never decides the verification outcome; absent comparable facts become `INSUFFICIENT_EVIDENCE`.
 
+## Citizen-facing verification (Phase 6)
+
+The verification route renders `CaseDetail.verification` only after the persisted deterministic result is loaded. `VerificationSummary` groups `PASS`, `POTENTIAL_ISSUE`, and `INSUFFICIENT_EVIDENCE` into plain-language states. `VerificationDiscrepancyCard` is presentation-only: it receives the rule output plus the selected case's persisted documents, resolves the stored source-document IDs, and displays expected/observed values and the rule evidence. React does not repeat, infer, or alter verification decisions. The data flow is `prepared/extracted synthetic facts → deterministic verification → persisted verification result → citizen-facing evidence and explanation`.
+
 ## Testing strategy
 
 - **Unit (Vitest):** normalizers, identifier/area comparisons, rule registry, guidance mapping, schema validation, watermark assertions.
