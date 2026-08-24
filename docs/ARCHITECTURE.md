@@ -207,6 +207,10 @@ The verification route renders `CaseDetail.verification` only after the persiste
 
 `GuidanceService` derives an ordered `GuidanceItem` list from the current persisted verification results and the selected case's existing synthetic documents. Potential issues map to `READY_TO_REVIEW`, missing evidence maps to `NEEDS_MORE_INFORMATION`, and passes map to `NO_ACTION_NEEDED`. Guidance is returned with the case API as `CaseDetail.guidance`; it is regenerated rather than stored, so derived content cannot drift from a verification rerun. The checklist is browser-local preparation state only. The flow is `verification result → deterministic guidance mapping → CaseDetail.guidance → preparation UI`; it never submits an application or makes a legal conclusion.
 
+## Review packet (Phase 7B)
+
+`ReviewPacketService` creates a persisted synthetic draft only from a selected `POTENTIAL_ISSUE`. The UI may edit citizen notes and clarification wording, then make the one-way `DRAFT → READY_FOR_REVIEW` confirmation. Immutable evidence remains source references and compared values; no submission state or government integration exists.
+
 ## Testing strategy
 
 - **Unit (Vitest):** normalizers, identifier/area comparisons, rule registry, guidance mapping, schema validation, watermark assertions.

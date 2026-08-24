@@ -1,0 +1,5 @@
+import { NextResponse } from "next/server";
+import { reviewPacketService } from "@/server/review-packet-service";
+export const runtime = "nodejs";
+export async function GET(_: Request, { params }: { params: Promise<{ caseId: string; packetId: string }> }) { const { caseId, packetId } = await params; const packet = reviewPacketService.get(caseId, packetId); return packet ? NextResponse.json({ data: packet }) : NextResponse.json({ error: { code: "PACKET_NOT_FOUND" } }, { status: 404 }); }
+export async function PATCH(request: Request, { params }: { params: Promise<{ caseId: string; packetId: string }> }) { const { caseId, packetId } = await params; const body = await request.json() as { citizenNotes?: string; requestedReviewText?: string; status?: "READY_FOR_REVIEW" }; if (body.status && body.status !== "READY_FOR_REVIEW") return NextResponse.json({ error: { code: "INVALID_INPUT" } }, { status: 400 }); try { return NextResponse.json({ data: reviewPacketService.update(caseId, packetId, body) }); } catch (error) { return NextResponse.json({ error: { code: error instanceof Error ? error.message : "INVALID_INPUT" } }, { status: 422 }); } }

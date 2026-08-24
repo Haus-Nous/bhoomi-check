@@ -1,0 +1,5 @@
+import { NextResponse } from "next/server";
+import { reviewPacketService } from "@/server/review-packet-service";
+export const runtime = "nodejs";
+export async function GET(_: Request, { params }: { params: Promise<{ caseId: string }> }) { const { caseId } = await params; return NextResponse.json({ data: reviewPacketService.list(caseId) }); }
+export async function POST(request: Request, { params }: { params: Promise<{ caseId: string }> }) { const { caseId } = await params; const body = await request.json() as { verificationResultId?: string }; if (!body.verificationResultId) return NextResponse.json({ error: { code: "INVALID_INPUT", message: "Choose a potential issue to prepare." } }, { status: 400 }); try { return NextResponse.json({ data: reviewPacketService.create(caseId, body.verificationResultId) }, { status: 201 }); } catch (error) { const code = error instanceof Error ? error.message : "INVALID_INPUT"; return NextResponse.json({ error: { code, message: "This packet could not be prepared from the selected result." } }, { status: code === "CASE_NOT_FOUND" ? 404 : 422 }); } }

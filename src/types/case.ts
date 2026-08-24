@@ -38,5 +38,7 @@ export type NextAction = { recommendedTitle: string; recommendedDetail: string; 
 export type GuidanceStatus = "READY_TO_REVIEW" | "NEEDS_MORE_INFORMATION" | "NO_ACTION_NEEDED";
 export type GuidanceChecklistItem = { id: string; label: string };
 export type GuidanceItem = { id: string; caseId: string; verificationResultId: string; ruleId: VerificationRuleId; title: string; explanation: string; priority: number; status: GuidanceStatus; documentIds: string[]; checklist: GuidanceChecklistItem[]; caution: string; sourceVerificationResultIds: string[] };
+export type ReviewPacketStatus = "DRAFT" | "READY_FOR_REVIEW";
+export type ReviewPacket = { id: string; caseId: string; relatedVerificationResultId: string; issueCategory: VerificationRuleId; district: string; circle: string; mauza: string; khata: string; khesra?: string; comparedValues: { expected?: string; observed?: string }; supportingDocumentIds: string[]; sourceVerificationResultIds: string[]; issueSummary: string; citizenNotes: string; requestedReviewText: string; status: ReviewPacketStatus; createdAt: string; updatedAt: string };
 export type TimelineEvent = { id: string; dateLabel: string; title: string; detail: string; status: TimelineStatus };
 export type CaseDetail = { case: LandCase; family: { members: FamilyMember[]; relationships: FamilyRelationship[] }; landParcels: LandParcel[]; documents: DocumentItem[]; surveyRecord?: SurveyRecord; verification: VerificationItem[]; guidance?: GuidanceItem[]; nextAction?: NextAction; timeline: TimelineEvent[] };
