@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./verification.css";
+import "./guidance.css";
 import { CaseProvider } from "@/components/case-context";
 import { Notice, SiteHeader } from "@/components/shell";
 export const metadata: Metadata = { title: "BhoomiCheck | Understand your land record", description: "Independent synthetic land-record assistance prototype." };

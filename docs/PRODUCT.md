@@ -45,6 +45,10 @@ Secondary demo user: a legal-aid volunteer or community facilitator using the ca
 
 The verification screen explains what BhoomiCheck compared in the available synthetic records. A pass means no obvious discrepancy was found in the records selected for that check; a potential issue means the records contain values or family/holder context that differ; insufficient evidence means the required comparable information is not available. Every potential issue displays its deterministic rule, compared values, source-document references, and a concise explanation of why it was flagged. None of these states establishes legal ownership, record correctness, fraud, mutation validity, or official verification.
 
+## Guided preparation experience
+
+The next-action screen turns each deterministic comparison result into a safe preparation item. It separates what BhoomiCheck found from what a citizen can review next, lists only existing synthetic records relevant to that comparison, and offers a local checklist for keeping references and questions organised. A checked item does not complete an official process. BhoomiCheck does not file, submit, correct, or otherwise interact with government systems; any legal or administrative action remains outside the prototype.
+
 ## Demo scenario and acceptance criteria
 
 Ship one polished seeded scenario, such as an inherited parcel where a legacy record uses a parent name, the family narrative contains a spelling variant, and the synthetic survey record has a different area or omitted heir. Seed multiple controlled variants only if time permits.

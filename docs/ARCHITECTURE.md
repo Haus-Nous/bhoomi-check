@@ -203,6 +203,10 @@ The selected case follows `Route → CaseService → API → CaseApplicationServ
 
 The verification route renders `CaseDetail.verification` only after the persisted deterministic result is loaded. `VerificationSummary` groups `PASS`, `POTENTIAL_ISSUE`, and `INSUFFICIENT_EVIDENCE` into plain-language states. `VerificationDiscrepancyCard` is presentation-only: it receives the rule output plus the selected case's persisted documents, resolves the stored source-document IDs, and displays expected/observed values and the rule evidence. React does not repeat, infer, or alter verification decisions. The data flow is `prepared/extracted synthetic facts → deterministic verification → persisted verification result → citizen-facing evidence and explanation`.
 
+## Guided preparation (Phase 7)
+
+`GuidanceService` derives an ordered `GuidanceItem` list from the current persisted verification results and the selected case's existing synthetic documents. Potential issues map to `READY_TO_REVIEW`, missing evidence maps to `NEEDS_MORE_INFORMATION`, and passes map to `NO_ACTION_NEEDED`. Guidance is returned with the case API as `CaseDetail.guidance`; it is regenerated rather than stored, so derived content cannot drift from a verification rerun. The checklist is browser-local preparation state only. The flow is `verification result → deterministic guidance mapping → CaseDetail.guidance → preparation UI`; it never submits an application or makes a legal conclusion.
+
 ## Testing strategy
 
 - **Unit (Vitest):** normalizers, identifier/area comparisons, rule registry, guidance mapping, schema validation, watermark assertions.
