@@ -1,0 +1,19 @@
+export type DocumentProcessingStatus = "not-started" | "processing" | "extracted" | "failed";
+export type DocumentKind = "legacy-record" | "family-note" | "survey-record";
+export type VerificationStatus = "passed" | "warning" | "review";
+export type TimelineStatus = "done" | "current" | "upcoming";
+
+export type CaseLocation = { district: string; circle: string; village: string };
+export type LandCase = { id: string; nickname: string; location: CaseLocation; surveyStage: string; progress: { done: number; total: number } };
+export type LandParcel = { id: string; label: string; khata: string; khesra?: string; area: { value: number; unit: "acres" } };
+export type FamilyMember = { id: string; name: string; role: string; note: string };
+export type FamilyRelationship = { id: string; fromMemberId: string; toMemberId: string; label: string };
+export type ExtractedField = { id: string; label: string; value: string; confidence: number; source: string };
+export type DocumentItem = { id: string; title: string; kind: DocumentKind; type: string; addedLabel: string; state: DocumentProcessingStatus; fields: ExtractedField[]; sourceText: string; isSynthetic: true };
+export type SyntheticDocumentFixture = { id: string; title: string; kind: DocumentKind; type: string; sourceText: string; isSynthetic: true };
+export type VerificationItem = { id: string; title: string; detail: string; status: VerificationStatus; confidence: number; evidence: string };
+export type SurveyRecord = { recordedName: string; khata: string; khesra?: string; area: { value: number; unit: "acres" }; surveyStage: string; mapReference: string };
+export type GuidanceAction = { id: string; title: string; detail: string };
+export type NextAction = { recommendedTitle: string; recommendedDetail: string; steps: string[]; options: GuidanceAction[] };
+export type TimelineEvent = { id: string; dateLabel: string; title: string; detail: string; status: TimelineStatus };
+export type CaseDetail = { case: LandCase; family: { members: FamilyMember[]; relationships: FamilyRelationship[] }; landParcels: LandParcel[]; documents: DocumentItem[]; surveyRecord?: SurveyRecord; verification: VerificationItem[]; nextAction?: NextAction; timeline: TimelineEvent[] };
