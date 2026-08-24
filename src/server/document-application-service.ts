@@ -2,10 +2,10 @@ import { DatabaseSync } from "node:sqlite";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { DocumentItem, DocumentKind } from "@/types/case";
+import type { PreparedDocument } from "@/server/extraction";
 
 const path = join(process.cwd(), "data", "bhoomi-check.sqlite");
 const notice = "Synthetic demo document — not an official government record.";
-type PreparedDocument = { documentId: string; caseId: string; documentType: DocumentKind; text: string; metadata: { filename: string; mimeType: string; section: string }; synthetic: true };
 const hero = [
   ["historical", "Historical Khatiyan-style record", "legacy-record", "Khata: DEMO-128\nKhesra: DEMO-456\nRecorded holder: Synthetic Elder 001\nArea: 1.20 acre\nMauza: Example Mauza A"],
   ["genealogy", "Genealogy / Vanshavali-style record", "family-note", "Synthetic Elder 001 → Synthetic Child A 001\nSynthetic Elder 001 → Synthetic Child B 001\nSynthetic Child A 001 → Synthetic Grandchild A 001"],

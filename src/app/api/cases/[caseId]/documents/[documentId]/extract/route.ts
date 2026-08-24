@@ -1,0 +1,7 @@
+import { NextResponse } from "next/server";
+import { documentApplicationService } from "@/server/document-application-service";
+import { ExtractionConfigurationError, ExtractionService, OpenAIExtractionProvider, SqliteExtractionRepository } from "@/server/extraction";
+export const runtime = "nodejs";
+const repository = new SqliteExtractionRepository();
+export async function GET(_: Request, { params }: { params: Promise<{ caseId: string; documentId: string }> }) { const { caseId, documentId } = await params; if (!documentApplicationService.prepare(caseId, documentId)) return NextResponse.json({ error: { code: "DOCUMENT_NOT_FOUND", message: "Synthetic document not found." } }, { status: 404 }); return NextResponse.json({ data: repository.latest(caseId, documentId) }); }
+export async function POST(_: Request, { params }: { params: Promise<{ caseId: string; documentId: string }> }) { const { caseId, documentId } = await params; const prepared = documentApplicationService.prepare(caseId, documentId); if (!prepared) return NextResponse.json({ error: { code: "DOCUMENT_NOT_FOUND", message: "Synthetic document not found." } }, { status: 404 }); try { const extraction = await new ExtractionService(new OpenAIExtractionProvider(), repository).extract(prepared); return NextResponse.json({ data: extraction }, { status: extraction.status === "completed" ? 201 : 502 }); } catch (error) { if (error instanceof ExtractionConfigurationError) return NextResponse.json({ error: { code: "AI_UNAVAILABLE", message: error.message } }, { status: 503 }); throw error; } }

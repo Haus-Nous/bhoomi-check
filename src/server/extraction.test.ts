@@ -1,0 +1,15 @@
+import { describe, expect, it } from "vitest";
+import { ExtractionConfigurationError, ExtractionService, OpenAIExtractionProvider, validateExtraction, type ExtractionProvider, type ExtractionRepository, type PreparedDocument } from "@/server/extraction";
+import type { DocumentExtraction } from "@/types/case";
+const text = "Khata: DEMO-128\nArea: 1.20 acre";
+const prepared: PreparedDocument = { documentId: "doc", caseId: "demo-family-001", documentType: "legacy-record", text, metadata: { filename: "doc.txt", mimeType: "text/plain", section: "synthetic-content" }, synthetic: true };
+const raw = { documentType: "legacy record", facts: [{ key: "khata", value: "DEMO-128", confidence: "high", evidence: { quote: "DEMO-128", start: 7, end: 15 }, needsHumanReview: true, uncertainty: "" }] };
+class MemoryRepository implements ExtractionRepository { values: DocumentExtraction[] = []; save(value: DocumentExtraction) { this.values.push(value); } latest(_caseId: string, _documentId: string) { return this.values.at(-1) ?? null; } }
+describe("AI extraction trust boundary", () => {
+  it("accepts a grounded structured extraction", () => expect(validateExtraction(raw, text).facts[0]?.evidence.quote).toBe("DEMO-128"));
+  it("rejects malformed or ungrounded model output", () => { expect(() => validateExtraction({ facts: [{ ...raw.facts[0], evidence: { quote: "INVENTED", start: 7, end: 15 } }] }, text)).toThrow(); expect(() => validateExtraction({ facts: [{ value: "x" }] }, text)).toThrow(); });
+  it("persists valid results and provider metadata", async () => { const repository = new MemoryRepository(); const provider: ExtractionProvider = { name: "fake", model: "test-model", extract: async () => raw }; const result = await new ExtractionService(provider, repository).extract(prepared); expect(result.status).toBe("completed"); expect(repository.latest("demo-family-001", "doc")?.provider).toBe("fake"); });
+  it("persists an explicit provider failure without fabricated fields", async () => { const repository = new MemoryRepository(); const provider: ExtractionProvider = { name: "fake", model: "test-model", extract: async () => { throw new Error("offline"); } }; const result = await new ExtractionService(provider, repository).extract(prepared); expect(result.status).toBe("failed"); expect(result.result).toBeUndefined(); expect(result.error?.code).toBe("PROVIDER_FAILURE"); });
+  it("fails gracefully when OpenAI configuration is missing", () => expect(() => new OpenAIExtractionProvider("")).toThrow(ExtractionConfigurationError));
+  it("preserves hero and control facts without cross-case hard-coding", () => { const hero = "Area: 1.02 acre"; const control = "Area: 1.25 acre"; expect(validateExtraction({ documentType: "survey record", facts: [{ key: "recordedArea", value: "1.02", confidence: "high", evidence: { quote: "1.02", start: 6, end: 10 }, needsHumanReview: true, uncertainty: "" }] }, hero).facts[0]?.value).toBe("1.02"); expect(control).not.toContain("1.02"); });
+});
