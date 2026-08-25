@@ -211,6 +211,10 @@ The verification route renders `CaseDetail.verification` only after the persiste
 
 `ReviewPacketService` creates a persisted synthetic draft only from a selected `POTENTIAL_ISSUE`. The UI may edit citizen notes and clarification wording, then make the one-way `DRAFT → READY_FOR_REVIEW` confirmation. Immutable evidence remains source references and compared values; no submission state or government integration exists.
 
+## Unified case state (Phase 8)
+
+The case API composes a current read model from persisted case rows, deterministic verification, derived guidance, review packets, and an honest timeline. `buildTimeline` adds only states evidenced by stored records—for example available documents, completed verification, detected potential discrepancies, guidance, and packet status. It deliberately does not fabricate “reviewed” activity. This keeps dashboard, timeline, guidance, and packet views aligned with the same selected-case state.
+
 ## Testing strategy
 
 - **Unit (Vitest):** normalizers, identifier/area comparisons, rule registry, guidance mapping, schema validation, watermark assertions.

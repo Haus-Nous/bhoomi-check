@@ -53,6 +53,10 @@ The next-action screen turns each deterministic comparison result into a safe pr
 
 The Parcha screen compares the persisted synthetic survey record with deterministic verification outputs. A review packet is a clearly labelled synthetic draft for citizen review, retaining source references and compared values. Marking it ready for review never submits it to a government system.
 
+## Current case journey
+
+The dashboard, timeline, records, verification, guidance, and review packet views use the current selected case state. BhoomiCheck presents one preparation-oriented next step based on the available deterministic findings and packet status. Empty states explain what information is not yet available, while no screen treats an unavailable record or insufficient evidence as a failure or legal conclusion.
+
 ## Demo scenario and acceptance criteria
 
 Ship one polished seeded scenario, such as an inherited parcel where a legacy record uses a parent name, the family narrative contains a spelling variant, and the synthetic survey record has a different area or omitted heir. Seed multiple controlled variants only if time permits.
