@@ -41,6 +41,12 @@ Secondary demo user: a legal-aid volunteer or community facilitator using the ca
 - **Plain language:** show the source terminology and an understandable explanation side by side. Begin bilingual support with English plus simple Hindi labels/content; do not claim certified translations.
 - **Safety by design:** persistent prototype/synthetic/non-legal notices and no real government integrations.
 
+## Language and terminology
+
+BhoomiCheck supports English and Hindi presentation from one controlled copy source. Familiar record terms remain recognizable across both languages, including Khata (खाता), Khesra (खेसरा), Mauza (मौजा), Khanapuri Parcha (खानापुरी पर्चा), and Vanshavali (वंशावली). The selected language changes explanatory text, guidance, safety notices, validation feedback, and packet preparation labels; it never changes an identifier, source reference, verification finding, legal boundary, or underlying synthetic record.
+
+For stored verification results and review packets, BhoomiCheck uses deterministic locale-specific display templates keyed by the existing rule/category. It never machine-translates a citizen’s free-text notes. Changing language therefore cannot alter the case evidence, verification status, compared values, packet status, or identifiers.
+
 ## Citizen-facing verification experience
 
 The verification screen explains what BhoomiCheck compared in the available synthetic records. A pass means no obvious discrepancy was found in the records selected for that check; a potential issue means the records contain values or family/holder context that differ; insufficient evidence means the required comparable information is not available. Every potential issue displays its deterministic rule, compared values, source-document references, and a concise explanation of why it was flagged. None of these states establishes legal ownership, record correctness, fraud, mutation validity, or official verification.

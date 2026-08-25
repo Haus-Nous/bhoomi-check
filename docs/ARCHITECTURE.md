@@ -215,6 +215,14 @@ The verification route renders `CaseDetail.verification` only after the persiste
 
 The case API composes a current read model from persisted case rows, deterministic verification, derived guidance, review packets, and an honest timeline. `buildTimeline` adds only states evidenced by stored records—for example available documents, completed verification, detected potential discrepancies, guidance, and packet status. It deliberately does not fabricate “reviewed” activity. This keeps dashboard, timeline, guidance, and packet views aligned with the same selected-case state.
 
+## Bilingual citizen presentation (Phase 9)
+
+`src/lib/i18n.ts` is the single source of citizen-facing English and Hindi copy. `LocaleProvider` persists the selected locale in browser storage, updates the document language, and exposes the selected dictionary through `useTranslation`. The language control changes presentation only; it preserves the route and selected case ID.
+
+For current case reads, the service sends `X-Bhoomi-Locale` to `GET /api/cases/:caseId`. The route handler passes that locale to `GuidanceService`, which localizes titles, explanations, cautions, and checklists while retaining the same result IDs, rule IDs, priorities, statuses, evidence and source-document IDs. Verification remains deterministic and persisted independently of locale. Packet IDs, case IDs, document IDs, Khata/Khesra values, and raw source references are never translated.
+
+Persisted verification and packet rows can contain earlier source-language prose. `localizedVerificationPresentation` and `localizedPacketPresentation` derive display-only templates from immutable rule/category metadata, without modifying stored evidence, compared values, source IDs, packet IDs, statuses, or citizen-authored notes. This keeps an English → Hindi → English switch presentation-only and avoids accidental translation of citizen text.
+
 ## Testing strategy
 
 - **Unit (Vitest):** normalizers, identifier/area comparisons, rule registry, guidance mapping, schema validation, watermark assertions.

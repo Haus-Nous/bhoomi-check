@@ -40,4 +40,14 @@ describe("deterministic next-action guidance", () => {
     expect(control.every((item) => item.caseId === "demo-family-002")).toBe(true);
     expect(control).not.toEqual(hero);
   });
+
+  it("localizes citizen-facing guidance without changing deterministic meaning or traceability", () => {
+    const verification = verificationService.run("demo-family-001")!;
+    const documents = documentApplicationService.list("demo-family-001");
+    const english = guidanceService.build("demo-family-001", verification, documents, "en");
+    const hindi = guidanceService.build("demo-family-001", verification, documents, "hi");
+    expect(hindi.map(({ id, verificationResultId, ruleId, priority, status, documentIds, sourceVerificationResultIds }) => ({ id, verificationResultId, ruleId, priority, status, documentIds, sourceVerificationResultIds }))).toEqual(english.map(({ id, verificationResultId, ruleId, priority, status, documentIds, sourceVerificationResultIds }) => ({ id, verificationResultId, ruleId, priority, status, documentIds, sourceVerificationResultIds })));
+    expect(hindi[0]?.title).not.toBe(english[0]?.title);
+    expect(hindi[0]?.caution).toContain("तैयारी");
+  });
 });
