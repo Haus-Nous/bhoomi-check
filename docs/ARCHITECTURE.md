@@ -229,6 +229,10 @@ Persisted verification and packet rows can contain earlier source-language prose
 
 Extraction prompt content is centralized in `extraction-prompt.ts` with a recorded prompt version. Extraction records retain provider, model, prompt version, timestamp, structured output, and evidence; verification and packets retain their existing rule/result and source-reference lineage.
 
+## Evaluation and lightweight observability (Phase 11)
+
+`src/evaluation` is isolated from citizen product logic and holds synthetic benchmark ground truth, scoring, and deterministic evaluation tests. `npm run eval` runs without OpenAI credentials. `metrics.ts` provides a process-local timing/counter event boundary that stores operation names, outcomes, durations, and minimal IDs only; it is not production monitoring or a citizen analytics feature.
+
 ## Testing strategy
 
 - **Unit (Vitest):** normalizers, identifier/area comparisons, rule registry, guidance mapping, schema validation, watermark assertions.

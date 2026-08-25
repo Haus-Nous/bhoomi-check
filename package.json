@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "eval": "vitest run src/evaluation/evaluation-runner.test.ts --reporter=verbose"
   },
   "dependencies": {
     "@types/node": "^22.0.0",

@@ -93,3 +93,7 @@ A credible live demo must show:
 - Every important field is traceable to a synthetic source.
 - Findings are explainable, reproducible, and visibly distinguish “possible inconsistency” from a legal conclusion.
 - The exported packet cannot plausibly be confused with an official document.
+
+## Prototype evaluation
+
+BhoomiCheck includes a small synthetic benchmark for reproducible development checks. Its results measure only the declared fixtures and deterministic rule behavior; they are not claims about real-world records, legal accuracy, or production performance.

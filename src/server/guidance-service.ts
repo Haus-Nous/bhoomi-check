@@ -1,5 +1,6 @@
 import type { Locale } from "@/lib/i18n";
 import type { DocumentItem, GuidanceItem, VerificationItem } from "@/types/case";
+import { measure, metrics } from "@/server/metrics";
 
 function relatedDocuments(item: VerificationItem, documents: DocumentItem[]) {
   const supportingIds = documents.filter((document) => document.id.endsWith("current") || document.id.endsWith("support")).map((document) => document.id);
@@ -26,7 +27,7 @@ function forResult(caseId: string, item: VerificationItem, documents: DocumentIt
 }
 
 export class GuidanceService {
-  build(caseId: string, verification: VerificationItem[], documents: DocumentItem[], locale: Locale = "en") { return verification.map((item) => forResult(caseId, item, documents, locale)).sort((left, right) => left.priority - right.priority); }
+  build(caseId: string, verification: VerificationItem[], documents: DocumentItem[], locale: Locale = "en") { return measure(metrics, "guidance", () => verification.map((item) => forResult(caseId, item, documents, locale)).sort((left, right) => left.priority - right.priority), { caseId, results: verification.length, locale }); }
 }
 
 export const guidanceService = new GuidanceService();

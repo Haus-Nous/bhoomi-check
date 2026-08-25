@@ -37,6 +37,8 @@ flowchart TD
 
 Future deployment would use a managed relational database, encrypted object storage with server-generated object keys, and asynchronous workers for document processing. A model gateway would keep provider credentials server-side and log only redacted operational metadata. Human review remains required before consequential action. Audit events would be separate from the citizen timeline and retain operation, case reference, actor/session boundary, timestamp, rule/prompt version, and result IDs without duplicating document contents.
 
+The implemented prototype has only process-local lightweight timing events and a synthetic deterministic evaluation command. Centralized monitoring, alerting, trace retention, dashboards, and model evaluation pipelines are future work.
+
 Future access control, tenant isolation, backups/recovery testing, retention policies, encryption, monitoring, rate limits, and incident response are **not implemented**. Any government integration must use an approved, documented interface with explicit authority; it must never be inferred from website behavior.
 
 ## SQLite and deployment limitation
