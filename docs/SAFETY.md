@@ -65,3 +65,10 @@ The application must validate the response server-side, retain raw extraction se
 - [ ] AI output is validated and reviewable before it is shown as a case fact.
 - [ ] Findings say “potential inconsistency” and never determine ownership.
 - [ ] A manual demo reset restores only synthetic seed data.
+# Phase 10 boundary and security notes
+
+- `MockGovernmentAdapter` is synthetic-only and has no network behavior. Official integration is future, approved-interface-only work.
+- Prepared document text is untrusted input. The versioned extraction prompt explicitly rejects instructions inside the document; structured schema/evidence validation remains authoritative.
+- OpenAI configuration is server-side only. `.env*` is ignored except for the sample-only `.env.example`.
+- Citizen API responses use safe generic failures; they do not intentionally return stack traces, SQLite paths, raw SQL, file paths, provider credentials, or provider internals.
+- Current inputs are bundled synthetic fixtures. No arbitrary upload/storage path is accepted.

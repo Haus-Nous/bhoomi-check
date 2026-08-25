@@ -1,0 +1,48 @@
+# BhoomiCheck Production Architecture
+
+## Implemented prototype architecture
+
+```mermaid
+flowchart TD
+  UI[Citizen web UI] --> API[Next.js route handlers]
+  API --> APP[Application services]
+  APP --> DB[(Local SQLite)]
+  APP --> EXT[Extraction service]
+  EXT --> OAI[OpenAI provider, optional]
+  APP --> VER[Deterministic verification]
+  APP --> GOV[GovernmentAdapter]
+  GOV --> MOCK[MockGovernmentAdapter\nsynthetic data only]
+```
+
+The current prototype is a local Next.js application. Case, document, extraction, verification, packet, and timeline data are held in a local SQLite file excluded from Git. Deterministic verification operates over stored synthetic records. OpenAI extraction is optional, server-side only, and uses a versioned structured-output prompt. The only government boundary implemented is `MockGovernmentAdapter`; it is deterministic, performs no network calls, and labels every result as synthetic and non-official.
+
+`GovernmentAdapter` is an interface for future approved integrations. No `OfficialGovernmentAdapter`, portal integration, scraping, reverse engineering, OTP workflow, credential use, or submission behavior exists in this repository.
+
+## Future production architecture — not implemented
+
+```mermaid
+flowchart TD
+  UI[Citizen web app] --> API[Application/API service]
+  API --> DOMAIN[Domain services]
+  DOMAIN --> RDB[(Managed relational database)]
+  DOMAIN --> OBJ[Private object storage]
+  DOMAIN --> QUEUE[Background queue/workers]
+  QUEUE --> MODEL[Model gateway / approved provider]
+  DOMAIN --> VERIFY[Deterministic verification]
+  VERIFY --> HUMAN[Human review workflow]
+  DOMAIN --> AUDIT[Audit logging / observability]
+  DOMAIN --> ADAPTER[Approved GovernmentAdapter]
+  ADAPTER -. documented authorization only .-> GOV[Government interface]
+```
+
+Future deployment would use a managed relational database, encrypted object storage with server-generated object keys, and asynchronous workers for document processing. A model gateway would keep provider credentials server-side and log only redacted operational metadata. Human review remains required before consequential action. Audit events would be separate from the citizen timeline and retain operation, case reference, actor/session boundary, timestamp, rule/prompt version, and result IDs without duplicating document contents.
+
+Future access control, tenant isolation, backups/recovery testing, retention policies, encryption, monitoring, rate limits, and incident response are **not implemented**. Any government integration must use an approved, documented interface with explicit authority; it must never be inferred from website behavior.
+
+## SQLite and deployment limitation
+
+SQLite is the local prototype persistence adapter. It is not presented as production-scale infrastructure. The repository/application service boundary allows a future managed relational adapter without coupling citizen UI components to the database. Object storage, queues, multi-instance locking, backups, and production access control are future work.
+
+## Upload safety boundary
+
+Current document inputs are bundled synthetic fixtures; no arbitrary user upload route exists. A future upload implementation must enforce allowlisted content types and sizes, sanitize display filenames, generate storage IDs server-side, reject executable content, and never accept a client-controlled filesystem path.

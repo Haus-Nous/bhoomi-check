@@ -223,6 +223,12 @@ For current case reads, the service sends `X-Bhoomi-Locale` to `GET /api/cases/:
 
 Persisted verification and packet rows can contain earlier source-language prose. `localizedVerificationPresentation` and `localizedPacketPresentation` derive display-only templates from immutable rule/category metadata, without modifying stored evidence, compared values, source IDs, packet IDs, statuses, or citizen-authored notes. This keeps an English → Hindi → English switch presentation-only and avoids accidental translation of citizen text.
 
+## Government boundary and workflow configuration (Phase 10)
+
+`GovernmentAdapter` is a server-only boundary with survey status, survey record, and safe-action capabilities. The implemented `MockGovernmentAdapter` derives deterministic data from the selected synthetic case and never makes a network call. `survey-workflow.ts` independently defines the meaning and caution of the synthetic stages; persisted `case.surveyStage` remains domain truth. The case API attaches clearly marked mock process context without making frontend components depend on an adapter.
+
+Extraction prompt content is centralized in `extraction-prompt.ts` with a recorded prompt version. Extraction records retain provider, model, prompt version, timestamp, structured output, and evidence; verification and packets retain their existing rule/result and source-reference lineage.
+
 ## Testing strategy
 
 - **Unit (Vitest):** normalizers, identifier/area comparisons, rule registry, guidance mapping, schema validation, watermark assertions.
