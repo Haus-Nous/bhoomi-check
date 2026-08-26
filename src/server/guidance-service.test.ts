@@ -27,9 +27,10 @@ describe("deterministic next-action guidance", () => {
     expect(items.at(-1)?.status).toBe("NO_ACTION_NEEDED");
   });
 
-  it("maps missing evidence to needs-more-information without false urgency in the control case", () => {
+  it("keeps the control case informational without false urgency", () => {
     const items = guidanceFor("demo-family-002");
-    expect(items.every((item) => item.status === "NEEDS_MORE_INFORMATION")).toBe(true);
+    expect(items.some((item) => item.status === "NEEDS_MORE_INFORMATION")).toBe(true);
+    expect(items.some((item) => item.status === "NO_ACTION_NEEDED")).toBe(true);
     expect(items.some((item) => item.status === "READY_TO_REVIEW")).toBe(false);
   });
 

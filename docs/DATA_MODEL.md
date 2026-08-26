@@ -15,6 +15,8 @@ Node SQLite stores synthetic case aggregates in `data/bhoomi-check.sqlite`, whic
 
 `READY_FOR_REVIEW` means a local packet snapshot is frozen; it is never submitted, received, or approved by any government system. The packet service reuses the earliest packet for a case/result pair rather than generating duplicate drafts.
 
+The controlled demo reset deletes and recreates state only for the two server-defined seed IDs. It restores their synthetic aggregate, fixture documents, verification/packet/timeline state, and leaves every newly created synthetic case untouched.
+
 ## Derived read-model state
 
 `CaseDetail.guidance` is derived deterministically from current verification results and existing documents; it is not separately persisted. The case API also builds a current timeline/read model, ensuring the dashboard and case screens consume the selected case’s persisted state.

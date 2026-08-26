@@ -20,6 +20,7 @@ This repository is an independent hackathon prototype using synthetic/mock data 
 - Verification uses terms such as `POTENTIAL_ISSUE` and `INSUFFICIENT_EVIDENCE`; it does not pronounce a record invalid or name an owner.
 - Every verification result keeps its source document references and evidence text.
 - The review packet is a local MOCK preparation record. Marking it ready for review freezes local editing; it does not send, export, print, or submit anything.
+- Demo reset is limited to the two built-in seed IDs and is not a generic delete operation; it cannot target an arbitrary created case.
 
 ## Extraction and AI guardrails
 

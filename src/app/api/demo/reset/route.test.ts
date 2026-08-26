@@ -1,0 +1,23 @@
+import { describe, expect, it } from "vitest";
+import { POST } from "@/app/api/demo/reset/route";
+import { caseApplicationService } from "@/server/case-application-service";
+import { reviewPacketService } from "@/server/review-packet-service";
+
+const request = (body: unknown) => new Request("http://localhost/api/demo/reset", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+
+describe("seed-only demo reset", () => {
+  it("restores one approved hero demo without touching an arbitrary synthetic case", async () => {
+    const arbitrary = caseApplicationService.createCase({ district: "Demo District", circle: "Demo Circle", village: "Example Mauza", khata: "DEMO-RESET-001", nickname: "Synthetic reset isolation case" });
+    reviewPacketService.create("demo-family-001", "demo-family-001-area-consistency");
+    const response = await POST(request({ caseId: "demo-family-001" }));
+    expect(response.status).toBe(200);
+    expect(caseApplicationService.getCaseDetail(arbitrary.case.id)?.case.id).toBe(arbitrary.case.id);
+    expect(reviewPacketService.list("demo-family-001")).toEqual([]);
+    expect(caseApplicationService.getCaseDetail("demo-family-001")?.case.nickname).toBe("Demo Case 001");
+  });
+
+  it("rejects arbitrary-case reset requests", async () => {
+    expect((await POST(request({ caseId: "demo-case-anything" }))).status).toBe(400);
+    expect((await POST(request({ caseId: "demo-family-001", deleteAll: true }))).status).toBe(400);
+  });
+});

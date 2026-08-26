@@ -52,6 +52,20 @@ OPENAI_API_KEY=...
 OPENAI_EXTRACTION_MODEL=gpt-4.1-mini
 ```
 
+## Demo
+
+1. Start the app and open `http://localhost:3000`.
+2. Select **Explore demo case** to enter Demo Case 001; no identifier entry is required.
+3. Open **Documents** and choose **Inspect fields** to read synthetic source text and quoted extraction evidence. Live extraction is optional: without `OPENAI_API_KEY`, the rest of the demo continues and the extraction screen reports a safe unavailable state.
+4. Open **Survey record**, then **Check records**. The hero case shows `AREA_CONSISTENCY = POTENTIAL_ISSUE` and `FAMILY_CONTEXT = POTENTIAL_ISSUE`, each with source document IDs and compared values.
+5. Continue to **Next step**, prepare a local MOCK review packet, and show the **Timeline**.
+6. Return home and select **Reset demo case** to restore Demo Case 001 for another run. Reset is limited to the two bundled seed cases and never deletes a newly created case.
+7. To show the control, open `/cases/demo-family-002`. It returns `AREA_CONSISTENCY = PASS` and `FAMILY_CONTEXT = INSUFFICIENT_EVIDENCE`.
+
+## Controlled demo deployment
+
+Deploy only to a long-lived Node.js host with a writable **persistent** volume mounted at the application `data/` directory. The current Node SQLite adapter requires both the Node runtime and that durable writable path; serverless/edge runtimes or ephemeral filesystem deployments are unsuitable because case, packet, and timeline changes will be lost or may fail. See [deployment notes](docs/DEPLOYMENT.md).
+
 ## Checks
 
 ```bash

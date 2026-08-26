@@ -36,8 +36,8 @@ export class VerificationService {
   run(caseId: string): VerificationItem[] | null { return measure(metrics, "verification", () => this.runDeterministic(caseId), { caseId, synthetic: true }); }
 
   evaluateDocuments(caseId: string, docs: DocumentItem[]): VerificationItem[] {
-    const historical = docs.find((document) => document.id.endsWith("historical"));
-    const survey = docs.find((document) => document.id.endsWith("survey"));
+    const historical = docs.find((document) => document.id.endsWith("historical")) ?? docs.find((document) => document.kind === "legacy-record" && document.id !== `${caseId}-document`);
+    const survey = docs.find((document) => document.id.endsWith("survey")) ?? docs.find((document) => document.kind === "survey-record");
     const genealogy = docs.find((document) => document.id.endsWith("genealogy"));
     const results: VerificationItem[] = [];
     const historicalArea = historical ? parseSupportedArea(historical.sourceText) : null;

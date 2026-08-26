@@ -45,7 +45,7 @@ Future access control, tenant isolation, backups/recovery testing, retention pol
 
 ## SQLite and deployment limitation
 
-SQLite is the local prototype persistence adapter. It is not presented as production-scale infrastructure. The repository/application service boundary allows a future managed relational adapter without coupling citizen UI components to the database. Object storage, queues, multi-instance locking, backups, and production access control are future work.
+SQLite is the local prototype persistence adapter. For the controlled hackathon demo only, it may run on one long-lived Node.js instance with a writable persistent `data/` volume; state survives only while that volume is retained. It is not compatible with edge runtime, ephemeral/read-only filesystem, or uncoordinated multi-instance deployment. It is not presented as production-scale infrastructure. The repository/application service boundary allows a future managed relational adapter without coupling citizen UI components to the database. Object storage, queues, multi-instance locking, backups, and production access control are future work. See `docs/DEPLOYMENT.md`.
 
 ## Upload safety boundary
 
