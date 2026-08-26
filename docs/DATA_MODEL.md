@@ -1,16 +1,28 @@
 # Data model
 
-SQLite persists synthetic cases and related people, relationships, parcels, documents, survey records, verification results, actions, and timeline events. Each table uses a text primary key and `case_id` foreign key; all seed data is fictional and carries synthetic-only content. The application service assembles those rows into the frontend `CaseDetail` contract.
+## Persisted local prototype state
 
-Document payloads persist ID, case ID, type, synthetic marker, processing state, deterministic source text, and metadata needed to form a `PreparedDocument`. Binary file storage and OCR are deliberately outside this prototype phase.
+Node SQLite stores synthetic case aggregates in `data/bhoomi-check.sqlite`, which is ignored by Git.
 
-`DocumentExtraction` records an immutable extraction attempt. A completed result contains typed facts with a field key, string value, coarse extraction confidence, exact source quote/span, uncertainty text, and `needsHumanReview`. Failed attempts contain no result and retain only a safe error state plus provider/model audit metadata.
+| State | Persistence | Notes |
+| --- | --- | --- |
+| Case, people, relationships, parcels, survey record | Case aggregate tables keyed by `case_id` | `CaseApplicationService` assembles these into `CaseDetail`. |
+| Documents | `documents` | Each document contains synthetic metadata, canonical source text, processing state, and deterministic fields. An approved fixture attachment has a deterministic case-and-fixture ID and is idempotent per case. |
+| Extraction attempt | `document_extractions` | Immutable completed/failed attempt with case/document IDs, provider/model, prompt version, timestamp, safe failure metadata, and accepted grounded result when completed. |
+| Verification snapshot | `verification_results` | Replaceable deterministic result set per case. Each item retains rule ID, outcome, source document IDs, compared values, evidence, and confidence. |
+| Review packet | `review_packets` | Local synthetic draft linked to one verification result. It retains source verification/document IDs, compared values, citizen notes/request, timestamps, and `DRAFT` or `READY_FOR_REVIEW` status. |
+| Timeline events | `timeline_events` | Persisted case activity plus packet events. It is citizen-facing history, not a technical audit log. |
 
-`verification_results` stores a replaceable deterministic snapshot per case. Its JSON payload maps to `VerificationItem`: `ruleId`, `outcome`, citizen-facing explanation, UI status, comparison confidence, source-document IDs, and expected/observed values when evidence is present. `outcome` is `PASS`, `POTENTIAL_ISSUE`, or `INSUFFICIENT_EVIDENCE`; the latter is stored instead of manufacturing a discrepancy when a required document or fact is unavailable. The result references the persisted synthetic documents used for the rule, preserving the provenance boundary established by document preparation and extraction.
+`READY_FOR_REVIEW` means a local packet snapshot is frozen; it is never submitted, received, or approved by any government system. The packet service reuses the earliest packet for a case/result pair rather than generating duplicate drafts.
 
-`review_packets` persists a synthetic citizen-review draft. It retains source verification and document IDs plus immutable compared values, while allowing only citizen notes, clarification wording, and a one-way `DRAFT` to `READY_FOR_REVIEW` transition. It has no submitted or government-received state.
-# Phase 10 auditability notes
+## Derived read-model state
 
-`DocumentExtraction` stores its ID, case/document association, status, provider, model, `promptVersion`, timestamp, structured result, and source evidence. Verification results retain rule ID, compared values, evidence, confidence, and source document IDs. Guidance links to source verification IDs. Review packets retain their related verification ID, source document IDs, compared values, current status, and timestamps.
+`CaseDetail.guidance` is derived deterministically from current verification results and existing documents; it is not separately persisted. The case API also builds a current timeline/read model, ensuring the dashboard and case screens consume the selected case’s persisted state.
 
-The citizen-facing timeline is not an infrastructure audit log. Future technical audit events should retain concise metadata (operation, case reference, actor/session boundary, timestamp, rule/prompt version, and result IDs) separately from citizen presentation.
+`PASS`, `POTENTIAL_ISSUE`, and `INSUFFICIENT_EVIDENCE` are verification outcomes, not legal findings. Missing or unusable required evidence is persisted as insufficient evidence rather than a discrepancy.
+
+## Configuration and boundaries
+
+`survey-workflow.ts` and `MockGovernmentAdapter` are server-side configuration/boundaries, not government data. `MockGovernmentAdapter` derives clearly synthetic workflow context and makes no network call.
+
+The database is a local single-process prototype adapter in the `synthetic-demo` profile. New cases use `DEMO-...` identifiers and labelled synthetic text; documents must originate from the server-side fixture registry. It has no user/session tenancy, production migrations, managed backups, object storage, background workers, or production audit logging. Only synthetic data belongs in it.

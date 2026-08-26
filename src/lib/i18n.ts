@@ -22,7 +22,7 @@ type Translation = {
 
 const en: Translation = {
   nav: { home: "Home", dashboard: "My case", documents: "Documents", family: "Family", verification: "Check records", survey: "Survey record", action: "Next step", timeline: "Timeline" },
-  notice: "Independent prototype · Synthetic demo data only · Not legal advice or a government service",
+  notice: "Independent prototype · Synthetic demo data only · Not legal advice or a government portal",
   footer: "© 2026 BhoomiCheck · Independent prototype · No real government records are used.",
   cta: { check: "Check My Land Record", how: "See How It Works", review: "Review survey record", continue: "Continue", back: "Back to case summary", close: "Close", save: "Save draft", preparePacket: "Prepare review packet", readyForReview: "Mark ready for review" },
   labels: { synthetic: "Synthetic demo", viewDetails: "View details", confidence: "Confidence", evidence: "Evidence", backToCase: "Back to my case", mock: "Mock only — nothing will be submitted", source: "Source", notAvailable: "Not available", optional: "Optional", caseHeader: "Your land case", skip: "Skip to content", homeLabel: "BhoomiCheck home", primaryNav: "Primary navigation", caseNav: "Case sections", chooseLanguage: "Choose language" },
@@ -42,7 +42,7 @@ const en: Translation = {
 
 const hi: Translation = {
   nav: { home: "होम", dashboard: "मेरा केस", documents: "दस्तावेज़", family: "परिवार", verification: "रिकॉर्ड जाँचें", survey: "सर्वे रिकॉर्ड", action: "अगला कदम", timeline: "समयरेखा" },
-  notice: "स्वतंत्र प्रोटोटाइप · केवल सिंथेटिक डेमो डेटा · कानूनी सलाह या सरकारी सेवा नहीं",
+  notice: "स्वतंत्र प्रोटोटाइप · केवल सिंथेटिक डेमो डेटा · कानूनी सलाह या सरकारी पोर्टल नहीं",
   footer: "© 2026 BhoomiCheck · स्वतंत्र प्रोटोटाइप · किसी वास्तविक सरकारी रिकॉर्ड का उपयोग नहीं किया जाता।",
   cta: { check: "भूमि रिकॉर्ड जाँचें", how: "कैसे काम करता है", review: "सर्वे रिकॉर्ड देखें", continue: "आगे बढ़ें", back: "केस सारांश पर लौटें", close: "बंद करें", save: "ड्राफ्ट सहेजें", preparePacket: "समीक्षा पैकेट तैयार करें", readyForReview: "समीक्षा के लिए तैयार चिह्नित करें" },
   labels: { synthetic: "सिंथेटिक डेमो", viewDetails: "विवरण देखें", confidence: "विश्वास", evidence: "साक्ष्य", backToCase: "मेरे केस पर लौटें", mock: "केवल मॉक — कुछ भी जमा नहीं होगा", source: "स्रोत", notAvailable: "उपलब्ध नहीं", optional: "वैकल्पिक", caseHeader: "आपका भूमि केस", skip: "मुख्य सामग्री पर जाएँ", homeLabel: "BhoomiCheck होम", primaryNav: "मुख्य नेविगेशन", caseNav: "केस अनुभाग", chooseLanguage: "भाषा बदलें" },

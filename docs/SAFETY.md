@@ -2,73 +2,55 @@
 
 ## Hard boundaries
 
-This repository implements an independent hackathon prototype using synthetic/mock data only.
+This repository is an independent hackathon prototype using synthetic/mock data only. It must not:
 
-The application must not:
+- access, scrape, crawl, reverse-engineer, or automate government websites or undocumented APIs;
+- submit, track, or prepare an actual government application, claim, objection, payment, or OTP flow;
+- request, receive, retain, or process real Aadhaar, PAN, bank/payment, or private land-record data;
+- determine legal ownership, inheritance rights, title validity, or legal outcomes; or
+- claim Government of Bihar affiliation, endorsement, operation, or branding.
 
-- connect to, scrape, crawl, reverse-engineer, or automate government websites or undocumented APIs;
-- submit, draft for actual submission, or track real government claims, objections, applications, or payments;
-- request, receive, retain, or process real Aadhaar, PAN, OTP, bank/payment, or private land-record data;
-- determine legal ownership, inheritance rights, title validity, or legal outcomes;
-- present itself as affiliated with, endorsed by, or operated by the Government of Bihar; or
-- use government marks/logos in a way that implies endorsement.
+## Implemented safeguards
 
-## Product safeguards
+- `PROTOTYPE_MODE = "synthetic-demo"` is a centralized server-side boundary. Case creation rejects non-`DEMO-...` identifiers and unlabelled/prohibited sensitive-looking case text; it is not an identity system.
+- The UI identifies the product as an independent prototype using synthetic demo data and not legal advice.
+- Seeded records and attachable fixtures are synthetic and labelled with demo identifiers.
+- The current document path attaches only bundled fixtures; there is no arbitrary file-upload endpoint.
+- `MockGovernmentAdapter` has no network behaviour and labels its output synthetic/non-official.
+- Verification uses terms such as `POTENTIAL_ISSUE` and `INSUFFICIENT_EVIDENCE`; it does not pronounce a record invalid or name an owner.
+- Every verification result keeps its source document references and evidence text.
+- The review packet is a local MOCK preparation record. Marking it ready for review freezes local editing; it does not send, export, print, or submit anything.
 
-1. Show a persistent header/footer notice: “Independent prototype. Synthetic demo data only. Not a government service or legal advice.”
-2. Gate uploads in the MVP to bundled synthetic files and generated test fixtures. If an open upload control is later enabled, require an acknowledgement and reject known high-risk identity/financial document categories; do not claim this is a complete privacy control.
-3. Prefix all seeded entities with unmistakably synthetic names/identifiers (for example `DEMO-`, fictional villages, and deliberately non-official document designs).
-4. Watermark every generated packet and printable view: `MOCK — SYNTHETIC DATA — NOT FOR GOVERNMENT SUBMISSION`.
-5. State “potential inconsistency” rather than “error,” “fraud,” “invalid,” or “owner.”
-6. State that next steps are informational prompts to verify with an appropriate qualified person or official channel, not legal recommendations.
-7. Link each extracted field and finding to the source evidence and reviewed status.
+## Extraction and AI guardrails
 
-## AI guardrails
+OpenAI extraction is optional, server-side, and only applicable to synthetic fixture text. It may suggest structured candidate fields, but accepted fields require schema validation, evidence-span validation, and semantic grounding against labelled source text. The deterministic verification service—not an LLM—decides whether a comparable discrepancy exists.
 
-The AI service is permitted to classify document type, suggest schema-constrained fields, normalize entities, extract stated relationships, and turn precomputed findings into plain-language explanations. It is not permitted to infer a legal owner, resolve competing claims, establish lineage as fact, or instruct the user to submit a legal filing.
+The application does not send arbitrary user uploads to a model provider because arbitrary uploads are not supported. Provider errors return safe citizen-facing failures without credentials, stack traces, database paths, raw SQL, or provider internals.
 
-All AI calls must use a schema-constrained response with:
+## Current local-data limitation
 
-- `value`, `confidence`, `evidence[]`, and `uncertainty` for extracted facts;
-- page/region or text-span citations where available;
-- a `needsHumanReview` flag;
-- no ungrounded factual statements; and
-- a prompt that repeats the prototype, synthetic-data, and non-adjudication boundaries.
+Case state is stored in local SQLite for the prototype. The application has no authentication, session boundary, tenant isolation, production retention/deletion workflow, encryption-at-rest deployment configuration, or production incident-response controls. Case-scoped resource validation prevents a nested document or packet ID from being used under a different selected case; it is not privacy, access control, or tenant isolation. Do not use it with real information.
 
-The application must validate the response server-side, retain raw extraction separately from reviewed facts, and fall back to deterministic/template copy when the AI response is invalid or unavailable.
+## Future work, explicitly not implemented
 
-## Data handling
+Future production work would need authenticated access, tenant isolation, managed encrypted storage, retention controls, redacted telemetry, controlled uploads, malware/content checks, human review, and approved documented government interfaces. Those controls cannot be inferred from the current local prototype.
 
-- Seeded synthetic data is the default and the only demo dataset.
-- Store uploaded fixtures in private object storage in production-like environments; use short-lived signed URLs.
-- Encrypt in transit and at rest, avoid document text in logs, and redact error telemetry.
-- Keep document hashes and metadata for traceability. Retention/deletion flows are deferred because the hackathon MVP prohibits real records.
-- Never send data to an LLM provider unless the case is synthetic and the request has passed validation.
+## Misuse review
 
-## Threat and misuse review
-
-| Risk | Mitigation |
+| Risk | Current mitigation |
 | --- | --- |
-| User treats output as official/legal | Persistent notices, careful language, evidence links, and mock-only exports |
-| Real records enter the demo | Synthetic-only upload allowlist, acknowledgement, clear demo positioning |
-| Hallucinated extraction | Strict schema, source citations, review workflow, deterministic comparisons |
-| Sensitive data leaks to logs/model | Fixture-only policy, log redaction, server-side validation |
-| Government affiliation confusion | Independent branding, no official logos, clear disclosures |
-| Tampered comparison result | Versioned inputs, finding rule/version, immutable audit events |
+| Output is treated as official or legal | Persistent prototype language, non-legal wording, source traceability, and no submission path |
+| Real records are added | Bundled synthetic fixtures only; no arbitrary upload control |
+| Extraction invents a fact | Candidate validation, source spans, semantic grounding, and accepted-fact persistence boundary |
+| A missing fact becomes a false discrepancy | Deterministic `INSUFFICIENT_EVIDENCE` outcome |
+| Government affiliation confusion | Independent brand, no government logos, no live integration |
+| Cross-user privacy expectation | Explicit local-prototype limitation; P1-09 authentication/session/tenancy is deferred |
 
 ## Release checklist
 
-- [ ] Every route has the independent-prototype notice.
-- [ ] All visible people, identifiers, documents, maps, and parcels are synthetic.
-- [ ] No outbound government URLs, API clients, scraping dependencies, or government logo assets exist.
-- [ ] Exports contain the mock watermark on every page.
-- [ ] AI output is validated and reviewable before it is shown as a case fact.
-- [ ] Findings say “potential inconsistency” and never determine ownership.
-- [ ] A manual demo reset restores only synthetic seed data.
-# Phase 10 boundary and security notes
-
-- `MockGovernmentAdapter` is synthetic-only and has no network behavior. Official integration is future, approved-interface-only work.
-- Prepared document text is untrusted input. The versioned extraction prompt explicitly rejects instructions inside the document; structured schema/evidence validation remains authoritative.
-- OpenAI configuration is server-side only. `.env*` is ignored except for the sample-only `.env.example`.
-- Citizen API responses use safe generic failures; they do not intentionally return stack traces, SQLite paths, raw SQL, file paths, provider credentials, or provider internals.
-- Current inputs are bundled synthetic fixtures. No arbitrary upload/storage path is accepted.
+- [ ] All visible fixtures, people, identifiers, maps, and parcels are synthetic.
+- [ ] No live government URLs, API clients, scraping code, or official logos are added.
+- [ ] No secrets or `.env` files are committed.
+- [ ] No screen describes a potential issue as a legal conclusion.
+- [ ] New documentation distinguishes implemented prototype behaviour from future production work.
+- [ ] Any future upload or export feature is reviewed against these boundaries before implementation.

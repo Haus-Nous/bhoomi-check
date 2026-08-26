@@ -10,15 +10,15 @@ The deterministic CI dataset contains 12 fully synthetic cases: clean records, a
 
 ## Ground truth
 
-Each fixture explicitly declares expected `AREA_CONSISTENCY` and `FAMILY_CONTEXT` outcomes plus relevant important facts. The benchmark fixture is the ground truth; it is not inferred from a production result.
+Each fixture explicitly declares input records and expected `AREA_CONSISTENCY` and `FAMILY_CONTEXT` outcomes plus relevant important facts. Ground truth is declared independently of the evaluated outcome. The runner constructs synthetic `DocumentItem` inputs and invokes the production `VerificationService`; it does not duplicate the rule algorithm in evaluation code.
 
 ## Extraction metrics
 
-`scoreExpectedFacts` reports expected facts, matched facts, missing facts, false extractions, and evidence presence. The test includes a concrete two-fact scenario with two matches and one false extraction. Runtime extraction tests separately validate malformed output rejection, source-span grounding, provider failure, missing configuration, and prompt-version retention.
+`scoreExpectedFacts` is a deterministic extraction-contract scoring helper: it reports expected facts, matched facts, missing facts, false extractions, and evidence presence. It is not a live OpenAI extraction-accuracy benchmark. Runtime extraction tests separately validate semantic evidence grounding, malformed output rejection, provider failure, missing configuration, prompt-version retention, and metric outcomes. No live model call runs in CI.
 
 ## Verification metrics
 
-The runner evaluates 24 rule checks (12 fixtures × 2 rules), including 1.20 vs 1.200 normalization and insufficient evidence. The deterministic fixture run reports all expected outcomes correctly, with zero false positives and zero false negatives for this intentionally small synthetic set.
+The runner evaluates 24 production-rule checks (12 fixtures × 2 rules), including 1.20 vs 1.200 normalization and insufficient evidence. It calculates correctness, incorrect outcomes, false positives, false negatives, expected/actual insufficient-evidence counts, insufficient-evidence classification errors, and per-rule outcome distributions from declared ground truth versus actual `VerificationService` output. A false positive is an actual `POTENTIAL_ISSUE` where ground truth is not a potential issue; a false negative is an expected potential issue that is not returned as one.
 
 ## Grounding/safety checks
 
@@ -38,12 +38,15 @@ Command: `npm run eval`
 
 - Dataset: 12 synthetic cases
 - Verification: 24/24 expected rule outcomes (100.0%)
+- Incorrect outcomes: 0
 - False positives: 0
 - False negatives: 0
+- Expected / actual insufficient-evidence outcomes: 5 / 5
+- Insufficient-evidence classification errors: 0
 - Hero fixture: `AREA_CONSISTENCY = POTENTIAL_ISSUE`; `FAMILY_CONTEXT = POTENTIAL_ISSUE`
 - Control fixture: `AREA_CONSISTENCY = PASS`; `FAMILY_CONTEXT = INSUFFICIENT_EVIDENCE`
 
-These numbers are emitted by the deterministic runner and verified by the evaluation tests. They describe this fixture set only.
+These numbers are emitted by the deterministic runner using the production verification service and verified by evaluation tests, including a deliberately wrong outcome that lowers accuracy and changes confusion counts. They describe this fixture set only.
 
 ## What these results do not mean
 

@@ -3,7 +3,7 @@ import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import OpenAI from "openai";
 import { z } from "zod";
-import type { DocumentExtraction, ExtractedDocument } from "@/types/case";
+import type { DocumentExtraction, ExtractedDocument, ExtractionFactKey } from "@/types/case";
 import { DOCUMENT_EXTRACTION_PROMPT_VERSION, documentExtractionInstructions } from "@/server/extraction-prompt";
 import { measureAsync, metrics } from "@/server/metrics";
 
@@ -27,8 +27,28 @@ export class OpenAIExtractionProvider implements ExtractionProvider {
 
 export function validateExtraction(raw: unknown, sourceText: string): ExtractedDocument {
   const parsed = extractedDocumentSchema.safeParse(raw); if (!parsed.success) throw new ExtractionValidationError();
-  for (const fact of parsed.data.facts) { const { quote, start, end } = fact.evidence; if (end <= start || sourceText.slice(start, end) !== quote || !sourceText.includes(quote)) throw new ExtractionValidationError(); }
+  for (const fact of parsed.data.facts) { const { quote, start, end } = fact.evidence; if (end <= start || sourceText.slice(start, end) !== quote || !sourceText.includes(quote) || !isFactGrounded(fact.key, fact.value, quote)) throw new ExtractionValidationError(); }
   return parsed.data;
+}
+
+const normalizeIdentifier = (value: string) => value.trim().toUpperCase().replace(/\s+/g, "");
+const normalizeText = (value: string) => value.toLowerCase().replace(/[\s.,_-]+/g, "");
+const normalizeAreaUnit = (value: string) => value.trim().toLowerCase().replace(/s$/, "");
+const labelledValue = (quote: string, labels: string[]) => { const label = labels.map((value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"); return quote.match(new RegExp(`(?:${label})\\s*:\\s*(.+)`, "i"))?.[1]?.trim() ?? quote.trim(); };
+const parseAreaEvidence = (quote: string) => { const match = quote.match(/(?:Area|Recorded area)\s*:\s*([0-9]+(?:\.[0-9]+)?)\s*(acre|acres)\b/i); if (!match) return null; const value = Number(match[1]); return Number.isFinite(value) ? { value, unit: "acre" } : null; };
+
+function isFactGrounded(key: ExtractionFactKey, value: string, quote: string) {
+  if (!value.trim()) return false;
+  if (key === "khata" || key === "khesra") return normalizeIdentifier(value) === normalizeIdentifier(labelledValue(quote, [key]));
+  if (key === "recordedArea") { const evidence = parseAreaEvidence(quote); const numeric = Number(value); return Boolean(evidence && Number.isFinite(numeric) && numeric === evidence.value); }
+  if (key === "areaUnit") { const evidence = parseAreaEvidence(quote); return Boolean(evidence && normalizeAreaUnit(value) === evidence.unit); }
+  if (key === "personName") return normalizeText(value) === normalizeText(labelledValue(quote, ["Recorded holder", "Recorded name", "Grandparent", "Parent", "Family member under review"]));
+  if (key === "relationship") return normalizeText(value) === normalizeText(labelledValue(quote, ["Relationship"]));
+  if (key === "documentType") return normalizeText(value) === normalizeText(labelledValue(quote, ["Document type", "Type"]));
+  if (key === "surveyReference") return normalizeText(value) === normalizeText(labelledValue(quote, ["Map reference", "Survey reference"]));
+  if (key === "location") return normalizeText(value) === normalizeText(labelledValue(quote, ["Mauza", "Location", "Village"]));
+  if (key === "recordDate") return normalizeText(value) === normalizeText(labelledValue(quote, ["Record date", "Date"]));
+  return normalizeText(value) === normalizeText(quote);
 }
 
 export interface ExtractionRepository { save(value: DocumentExtraction): void; latest(caseId: string, documentId: string): DocumentExtraction | null; }
@@ -40,5 +60,5 @@ export class SqliteExtractionRepository implements ExtractionRepository {
 
 export class ExtractionService {
   constructor(private provider: ExtractionProvider, private repository: ExtractionRepository = new SqliteExtractionRepository()) {}
-  async extract(document: PreparedDocument): Promise<DocumentExtraction> { return measureAsync(metrics, "extraction", async () => { const createdAt = new Date().toISOString(); try { const raw = await this.provider.extract(document); const result = validateExtraction(raw, document.text); const extraction: DocumentExtraction = { id: crypto.randomUUID(), caseId: document.caseId, documentId: document.documentId, status: "completed", result, provider: this.provider.name, model: this.provider.model, promptVersion: DOCUMENT_EXTRACTION_PROMPT_VERSION, createdAt }; this.repository.save(extraction); return extraction; } catch (error) { const extraction: DocumentExtraction = { id: crypto.randomUUID(), caseId: document.caseId, documentId: document.documentId, status: "failed", provider: this.provider.name, model: this.provider.model, promptVersion: DOCUMENT_EXTRACTION_PROMPT_VERSION, createdAt, error: { code: error instanceof ExtractionValidationError ? "INVALID_MODEL_OUTPUT" : "PROVIDER_FAILURE", message: error instanceof ExtractionValidationError ? error.message : "AI extraction failed. No fields were accepted." } }; this.repository.save(extraction); return extraction; } }, { caseId: document.caseId, documentId: document.documentId, synthetic: true }); }
+  async extract(document: PreparedDocument): Promise<DocumentExtraction> { return measureAsync(metrics, "extraction", async () => { const createdAt = new Date().toISOString(); try { const raw = await this.provider.extract(document); const result = validateExtraction(raw, document.text); const extraction: DocumentExtraction = { id: crypto.randomUUID(), caseId: document.caseId, documentId: document.documentId, status: "completed", result, provider: this.provider.name, model: this.provider.model, promptVersion: DOCUMENT_EXTRACTION_PROMPT_VERSION, createdAt }; this.repository.save(extraction); return extraction; } catch (error) { const extraction: DocumentExtraction = { id: crypto.randomUUID(), caseId: document.caseId, documentId: document.documentId, status: "failed", provider: this.provider.name, model: this.provider.model, promptVersion: DOCUMENT_EXTRACTION_PROMPT_VERSION, createdAt, error: { code: error instanceof ExtractionValidationError ? "INVALID_MODEL_OUTPUT" : "PROVIDER_FAILURE", message: error instanceof ExtractionValidationError ? error.message : "AI extraction failed. No fields were accepted." } }; this.repository.save(extraction); return extraction; } }, { caseId: document.caseId, documentId: document.documentId, synthetic: true }, (extraction) => extraction.status === "completed" ? "success" : "failure"); }
 }

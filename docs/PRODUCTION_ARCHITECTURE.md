@@ -14,7 +14,7 @@ flowchart TD
   GOV --> MOCK[MockGovernmentAdapter\nsynthetic data only]
 ```
 
-The current prototype is a local Next.js application. Case, document, extraction, verification, packet, and timeline data are held in a local SQLite file excluded from Git. Deterministic verification operates over stored synthetic records. OpenAI extraction is optional, server-side only, and uses a versioned structured-output prompt. The only government boundary implemented is `MockGovernmentAdapter`; it is deterministic, performs no network calls, and labels every result as synthetic and non-official.
+The current prototype is a local Next.js application. Case, document, extraction, verification, packet, and timeline data are held in a local SQLite file excluded from Git. A packet is a local MOCK preparation record; `READY_FOR_REVIEW` freezes that local record and never submits or exports it. Deterministic verification operates over stored synthetic records. OpenAI extraction is optional, server-side only, and uses a versioned structured-output prompt. The only government boundary implemented is `MockGovernmentAdapter`; it is deterministic, performs no network calls, and labels every result as synthetic and non-official.
 
 `GovernmentAdapter` is an interface for future approved integrations. No `OfficialGovernmentAdapter`, portal integration, scraping, reverse engineering, OTP workflow, credential use, or submission behavior exists in this repository.
 
@@ -22,7 +22,9 @@ The current prototype is a local Next.js application. Case, document, extraction
 
 ```mermaid
 flowchart TD
-  UI[Citizen web app] --> API[Application/API service]
+  UI[Citizen web app] --> AUTH[Authenticated principal]
+  AUTH --> AUTHZ[Authorization / case ownership check]
+  AUTHZ --> API[Case-scoped application/API service]
   API --> DOMAIN[Domain services]
   DOMAIN --> RDB[(Managed relational database)]
   DOMAIN --> OBJ[Private object storage]
@@ -35,11 +37,11 @@ flowchart TD
   ADAPTER -. documented authorization only .-> GOV[Government interface]
 ```
 
-Future deployment would use a managed relational database, encrypted object storage with server-generated object keys, and asynchronous workers for document processing. A model gateway would keep provider credentials server-side and log only redacted operational metadata. Human review remains required before consequential action. Audit events would be separate from the citizen timeline and retain operation, case reference, actor/session boundary, timestamp, rule/prompt version, and result IDs without duplicating document contents.
+Future deployment accepting real citizen information must add an authenticated principal and authorization/case-ownership check before case persistence is exposed. It would use a managed relational database, encrypted object storage with server-generated object keys, and asynchronous workers for document processing. A model gateway would keep provider credentials server-side and log only redacted operational metadata. Human review remains required before consequential action. Audit events would be separate from the citizen timeline and retain operation, case reference, actor/session boundary, timestamp, rule/prompt version, and result IDs without duplicating document contents.
 
 The implemented prototype has only process-local lightweight timing events and a synthetic deterministic evaluation command. Centralized monitoring, alerting, trace retention, dashboards, and model evaluation pipelines are future work.
 
-Future access control, tenant isolation, backups/recovery testing, retention policies, encryption, monitoring, rate limits, and incident response are **not implemented**. Any government integration must use an approved, documented interface with explicit authority; it must never be inferred from website behavior.
+Future access control, tenant isolation, backups/recovery testing, retention policies, encryption, monitoring, rate limits, and incident response are **not implemented**. Authentication/session/tenant infrastructure (P1-09) remains explicitly deferred. Any government integration must use an approved, documented interface with explicit authority; it must never be inferred from website behavior.
 
 ## SQLite and deployment limitation
 

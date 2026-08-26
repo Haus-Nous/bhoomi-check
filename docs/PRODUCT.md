@@ -2,98 +2,55 @@
 
 ## Purpose
 
-**BhoomiCheck** is an independent, citizen-side assistance and verification prototype for the AI-Rebuilder 2026 hackathon.
+**BhoomiCheck** is an independent citizen-side assistance and verification prototype for the AI-Rebuilder 2026 hackathon.
 
 **Tagline:** *Understand your land record before you act.*
 
-It helps a person assemble a synthetic land-survey case from fragmented documents and family knowledge, compare the records, understand possible inconsistencies, and prepare a clearly labelled **MOCK** review, claim, or objection packet. It is not a Government of Bihar service, an official records portal, or a legal decision-maker.
+It helps a citizen understand a **synthetic** land-survey case, organise supplied demo records, identify deterministic record differences, and prepare a local **MOCK** review packet. It is not a Government of Bihar service, an official records portal, or a legal decision-maker.
 
-## Problem and users
+## Current prototype journey
 
-Land-survey participants may need to reconcile old records, Khata/Khesra identifiers, family lineage, inheritance narratives, survey records, Khanapuri Parcha, maps, claims, and administrative stages across disconnected sources. The immediate problem is comprehension and organization; the consequential problem is deciding what to verify next when records do not appear to agree.
+1. Create a local synthetic case with district, circle, village, Khata, optional Khesra, and nickname.
+2. Attach only bundled synthetic document fixtures.
+3. Inspect source text and run optional structured extraction.
+4. Review a unified case dashboard, family context, parcel summary, and synthetic survey record.
+5. Run deterministic verification and inspect source-backed findings.
+6. Read a single preparation-oriented next action.
+7. Prepare and locally save a MOCK review packet; a packet marked ready for review is read-only and is never submitted anywhere.
+8. Follow the timeline, which shows only events that have occurred for that persisted case.
 
-Primary user: a citizen or family helper preparing to understand a survey case.
+The seeded hero case (`demo-family-001`) demonstrates an area mismatch and a family-context mismatch. The seeded control (`demo-family-002`) does not demonstrate either hero discrepancy. A newly created case begins without documents, extraction, verification, guidance, or packet data and shows explanatory empty states.
 
-Secondary demo user: a legal-aid volunteer or community facilitator using the case summary to orient a citizen. The app must never represent their work as legal advice or a final ownership conclusion.
+## What the product currently checks
 
-## MVP journey
+Verification is deterministic. The implemented rules compare:
 
-1. Create a **synthetic** land-survey case.
-2. Add family members, relationships, land parcels, and identifiers.
-3. Upload only supplied synthetic/demo documents.
-4. Extract suggested structured fields and allow user review.
-5. Build a unified case view with source provenance.
-6. Compare identifiers, names, areas, relationships, and stated ownership/possession facts.
-7. Surface deterministic potential inconsistencies.
-8. Explain each finding in simple Hindi/English-oriented language, with its sources and a non-legal disclaimer.
-9. Display a synthetic Khanapuri Parcha/survey record.
-10. Compare the survey record with the reviewed case.
-11. Recommend a non-binding administrative next step from a curated rules matrix.
-12. Generate a watermarked **MOCK — NOT FOR SUBMISSION** review/claim/objection packet.
-13. Show a simple, editable case timeline.
+- area values when both source-backed values are present and parseable; and
+- the labelled family member under review with the labelled recorded holder when both source-backed values are present.
 
-## Product principles
+If a required fact is absent, malformed, or not comparable, the outcome is `INSUFFICIENT_EVIDENCE`, not an invented discrepancy. A potential issue means the available synthetic records differ; it does not establish ownership, inheritance, title, fraud, record correctness, or legal eligibility.
 
-- **Citizen-side, not system-side:** organize and explain information; do not transact with government systems.
-- **Provenance before confidence:** every displayed field identifies its source document, page, extraction method, and review status.
-- **Human confirmation:** extraction is a suggestion. People explicitly confirm or correct fields before they drive case conclusions.
-- **Deterministic checks:** numeric, identifier, and normalized-string comparisons use reproducible rules; AI explains but does not adjudicate.
-- **Plain language:** show the source terminology and an understandable explanation side by side. Begin bilingual support with English plus simple Hindi labels/content; do not claim certified translations.
-- **Safety by design:** persistent prototype/synthetic/non-legal notices and no real government integrations.
+## AI and extraction boundary
 
-## Language and terminology
+Document extraction is optional and server-side. When configured, an OpenAI provider may propose structured candidate facts. The application accepts a candidate only after schema, source-span, and semantic-grounding checks; otherwise it stores no accepted fact. Demo fixtures use controlled synthetic extraction behaviour. An LLM never determines verification status, legal ownership, or the next legal outcome.
 
-BhoomiCheck supports English and Hindi presentation from one controlled copy source. Familiar record terms remain recognizable across both languages, including Khata (खाता), Khesra (खेसरा), Mauza (मौजा), Khanapuri Parcha (खानापुरी पर्चा), and Vanshavali (वंशावली). The selected language changes explanatory text, guidance, safety notices, validation feedback, and packet preparation labels; it never changes an identifier, source reference, verification finding, legal boundary, or underlying synthetic record.
+## Language behaviour
 
-For stored verification results and review packets, BhoomiCheck uses deterministic locale-specific display templates keyed by the existing rule/category. It never machine-translates a citizen’s free-text notes. Changing language therefore cannot alter the case evidence, verification status, compared values, packet status, or identifiers.
+English and Hindi are presentation locales from one controlled copy structure. Switching language changes interface copy and rule/packet presentation templates only. It does not change persisted identifiers, source evidence, citizen notes, verification results, packet status, or other case facts.
 
-## Citizen-facing verification experience
+## Boundaries and non-goals
 
-The verification screen explains what BhoomiCheck compared in the available synthetic records. A pass means no obvious discrepancy was found in the records selected for that check; a potential issue means the records contain values or family/holder context that differ; insufficient evidence means the required comparable information is not available. Every potential issue displays its deterministic rule, compared values, source-document references, and a concise explanation of why it was flagged. None of these states establishes legal ownership, record correctness, fraud, mutation validity, or official verification.
+- No live government integration, government URLs, scraping, reverse engineering, credentials, OTP, payments, or submission.
+- No arbitrary or real-document upload: only bundled synthetic fixtures can be attached.
+- No Aadhaar, PAN, banking, or real private land-record data.
+- No legal ownership, title, inheritance, or filing determination.
+- No downloadable, printable, or official-looking packet export in the current prototype.
+- No authentication, session isolation, tenancy, production retention policy, or production deployment controls yet.
 
-## Guided preparation experience
+## Demo success criteria
 
-The next-action screen turns each deterministic comparison result into a safe preparation item. It separates what BhoomiCheck found from what a citizen can review next, lists only existing synthetic records relevant to that comparison, and offers a local checklist for keeping references and questions organised. A checked item does not complete an official process. BhoomiCheck does not file, submit, correct, or otherwise interact with government systems; any legal or administrative action remains outside the prototype.
+A credible demo shows a persisted synthetic case, evidence-backed deterministic findings, clear Hindi/English explanations, one next preparation action, and a locally persisted MOCK packet. All consequential screens retain the independent-prototype, synthetic-data, and non-legal boundary.
 
-## Synthetic Parcha and review packet
+## Synthetic evaluation
 
-The Parcha screen compares the persisted synthetic survey record with deterministic verification outputs. A review packet is a clearly labelled synthetic draft for citizen review, retaining source references and compared values. Marking it ready for review never submits it to a government system.
-
-## Current case journey
-
-The dashboard, timeline, records, verification, guidance, and review packet views use the current selected case state. BhoomiCheck presents one preparation-oriented next step based on the available deterministic findings and packet status. Empty states explain what information is not yet available, while no screen treats an unavailable record or insufficient evidence as a failure or legal conclusion.
-
-## Demo scenario and acceptance criteria
-
-Ship one polished seeded scenario, such as an inherited parcel where a legacy record uses a parent name, the family narrative contains a spelling variant, and the synthetic survey record has a different area or omitted heir. Seed multiple controlled variants only if time permits.
-
-A credible live demo must show:
-
-- a new synthetic case created end to end;
-- document upload or selection from a bundled synthetic document library;
-- visible extraction with user review and field-level source links;
-- at least three meaningful findings (for example area mismatch, Khata mismatch, name variation, or unresolved relationship);
-- a synthetic Khanapuri Parcha comparison;
-- plain-language next-step guidance tied to each finding;
-- a downloadable/printable mock packet with watermark; and
-- a timeline and explicit limitations on every consequential screen.
-
-## Explicit non-goals
-
-- Accessing, scraping, querying, or automating any live government system.
-- Real applications, objections, claims, payments, OTPs, Aadhaar/PAN handling, or official submissions.
-- Use or storage of real private land records or personal identity documents.
-- Legal ownership, inheritance, title, validity, or eligibility determinations.
-- Government branding, endorsement claims, or government logos.
-- Production-grade identity verification, payment, or public multi-tenant deployment for the hackathon.
-
-## Success measures for the demo
-
-- A first-time viewer can identify what sources disagree and why in under two minutes.
-- Every important field is traceable to a synthetic source.
-- Findings are explainable, reproducible, and visibly distinguish “possible inconsistency” from a legal conclusion.
-- The exported packet cannot plausibly be confused with an official document.
-
-## Prototype evaluation
-
-BhoomiCheck includes a small synthetic benchmark for reproducible development checks. Its results measure only the declared fixtures and deterministic rule behavior; they are not claims about real-world records, legal accuracy, or production performance.
+The repository includes a 12-case synthetic benchmark. Its reported values measure only those fixtures and deterministic checks. They are not claims about real land records, legal accuracy, model quality in the field, or production performance.

@@ -1,255 +1,53 @@
-# BhoomiCheck Architecture
+# BhoomiCheck architecture
 
-## Recommended stack
-
-| Layer | Choice | Why |
-| --- | --- | --- |
-| Web application | Next.js (App Router) + TypeScript | One typed full-stack codebase, fast demo delivery, server rendering and route handlers |
-| UI | Tailwind CSS, shadcn/ui, React Hook Form, Zod | Accessible primitives, fast consistent implementation, typed forms/validation |
-| Database | PostgreSQL + Prisma ORM | Relational integrity for provenance-heavy cases and ergonomic migrations |
-| Auth | Demo persona/session only for MVP; Auth.js if accounts are added | Avoids collecting real identity data while keeping a replaceable boundary |
-| File storage | Local fixture storage for development; S3-compatible private object storage abstraction | Synthetic document fixtures now; safe future replacement without UI changes |
-| Background work | In-process job adapter for MVP; BullMQ + Redis-compatible queue when deployed | Document extraction must not block requests; adapter prevents premature infrastructure |
-| Document handling | PDF.js/text extraction, OCR adapter (Tesseract or managed OCR), `pdf-lib`/React PDF export | Deterministic parsing and mock-packet generation |
-| AI | Provider-agnostic server-side LLM adapter with structured output (Zod/JSON Schema) | Enables extraction and explanations without coupling domain logic to one vendor |
-| Observability | Structured logs + Sentry-compatible error adapter; no document contents in logs | Demo diagnostics without sensitive content leakage |
-| Testing | Vitest, Testing Library, Playwright, MSW, Prisma test database | Fast rule tests plus full critical-journey coverage |
-| Delivery | Docker, GitHub Actions, managed Postgres/object store | Repeatable setup and a credible deploy path |
-
-Pin versions in the eventual `package.json` after project initialization; do not rely on floating versions. The MVP should remain functional in “demo mode” with no external AI, queue, or storage credentials.
-
-## System design
+## Implemented prototype flow
 
 ```mermaid
 flowchart LR
-  U[Citizen / Demo facilitator] --> W[Next.js Web UI]
-  W --> A[Typed API / Server Actions]
-  A --> DB[(PostgreSQL)]
-  A --> FS[Document storage adapter\nsynthetic fixtures]
-  A --> J[Extraction job adapter]
-  J --> P[Document parser / OCR]
-  J --> L[LLM structured-output adapter]
-  P --> DB
-  L --> DB
-  A --> C[Deterministic comparison engine]
-  C --> DB
-  A --> G[Mock packet generator]
-  G --> FS
+  UI[Citizen UI] --> CS[CaseService]
+  CS --> API[Next.js API routes]
+  API --> APP[Application / domain services]
+  APP --> DB[(Local SQLite: synthetic data)]
+  APP --> PREP[PreparedDocument]
+  PREP --> EXT[Optional ExtractionService]
+  EXT --> OAI[OpenAI provider when configured]
+  APP --> VER[VerificationService]
+  VER --> GUIDE[GuidanceService]
+  GUIDE --> PACKET[ReviewPacketService]
+  APP --> GOV[GovernmentAdapter]
+  GOV --> MOCK[MockGovernmentAdapter]
 ```
 
-The web layer is intentionally thin. Domain services own case assembly, provenance, comparison, action guidance, and export generation. Route handlers authenticate/validate inputs, invoke services, and return typed DTOs; they must not embed comparison rules or LLM prompts.
+The selected route is the case identity. UI components consume `CaseDetail`; they do not read SQLite or fixture files directly. The client `CaseService` calls typed case-scoped API routes. `PROTOTYPE_MODE = "synthetic-demo"` constrains new synthetic case inputs and approved fixture selection before persistence. Application services assemble persisted synthetic rows, deterministic verification, derived guidance, packets, and honest timeline state into the response.
 
-## Core domain modules
-
-- **Case service:** creates cases, maintains stages and timeline events, and produces the unified read model.
-- **Evidence service:** stores fixture metadata, parsed text, extraction runs, field evidence, and review decisions.
-- **Family/parcel service:** manages stated people, relationships, parcels, and identifiers without asserting legal facts.
-- **Normalization service:** canonicalizes whitespace, Hindi/Latin transliterations where configured, units, dates, and identifiers. It preserves original text.
-- **Comparison engine:** deterministic rule registry evaluates reviewed data and survey-record facts into versioned findings.
-- **Explanation service:** generates grounded, plain-language text only from the finding payload and its cited evidence. Template fallback is mandatory.
-- **Guidance service:** maps finding categories and survey stage to curated administrative-information cards. It never tells a user what legal right they have.
-- **Packet service:** creates a traceable mock review/claim/objection packet from confirmed data and selected findings.
-
-## Data flow
+## Document and verification flow
 
 ```mermaid
 flowchart TD
-  A[Select synthetic document] --> B[Store metadata, hash, case link]
-  B --> C[Parse text / OCR]
-  C --> D[AI proposes schema-constrained fields + evidence]
-  D --> E[Validate response and persist extraction run]
-  E --> F[User reviews, corrects, and confirms fields]
-  F --> G[Build unified case read model]
-  G --> H[Normalize identifiers, names, areas, relationships]
-  H --> I[Deterministic rules create potential findings]
-  I --> J[Grounded AI/template explanation]
-  J --> K[Curated next-step guidance]
-  K --> L[Watermarked mock packet + timeline]
+  F[Approved synthetic fixture] --> D[Persisted document]
+  D --> P[PreparedDocument]
+  P --> E[Optional model candidate extraction]
+  E --> V[Schema + span + semantic grounding validation]
+  V --> X[Persisted extraction attempt]
+  D --> R[Deterministic VerificationService]
+  R --> G[GuidanceService]
+  R --> K[Case-scoped review packet]
 ```
 
-## Database model
+Extraction is optional and can suggest only grounded candidate facts. `VerificationService` does not use an LLM: it strictly parses supported acreage and compares an explicit family comparison subject with the survey holder. It persists `PASS`, `POTENTIAL_ISSUE`, or `INSUFFICIENT_EVIDENCE` with source-document references.
 
-Use UUID primary keys, UTC timestamps, soft deletion only where necessary, and `created_at`/`updated_at` on mutable tables. Store source values and normalized values separately. A JSON column is suitable for flexible extraction payloads, never for relationships that need constraints/querying.
+## Government boundary
 
-| Table | Key fields / relationships | Purpose |
-| --- | --- | --- |
-| `users` | `id`, `display_name`, `role` | Demo identity boundary; no government identity fields |
-| `cases` | `id`, `created_by`, `title`, `status`, `locale`, `survey_stage` | Top-level synthetic case |
-| `case_timeline_events` | `case_id`, `event_type`, `occurred_on`, `description`, `source_document_id` | Case history and stage display |
-| `people` | `case_id`, `display_name`, `normalized_name`, `is_synthetic` | People mentioned by the case, not legal owners |
-| `family_relationships` | `case_id`, `person_a_id`, `person_b_id`, `relationship_type`, `assertion_status`, `source_field_id` | Stated family relationships with provenance |
-| `parcels` | `case_id`, `label`, `village_label`, `district_label`, `area_value`, `area_unit`, `normalized_area_sqm` | Synthetic parcel facts |
-| `parcel_identifiers` | `parcel_id`, `identifier_type`, `raw_value`, `normalized_value`, `source_field_id` | Khata, Khesra, plot and internal demo IDs |
-| `documents` | `case_id`, `kind`, `storage_key`, `sha256`, `page_count`, `is_synthetic` | Fixture/document metadata |
-| `document_pages` | `document_id`, `page_number`, `extracted_text` | Parsed page content, protected from logs |
-| `extraction_runs` | `document_id`, `pipeline_version`, `provider`, `status`, `raw_response_json` | Reproducible extraction processing |
-| `extracted_fields` | `run_id`, `schema_key`, `raw_value`, `normalized_value`, `confidence`, `evidence_json`, `needs_review` | AI/parser suggestions and citations |
-| `reviewed_facts` | `case_id`, `fact_type`, `subject_type`, `subject_id`, `value_json`, `review_status`, `source_extracted_field_id` | User-confirmed case facts; preserves lineage |
-| `survey_records` | `case_id`, `document_id`, `record_label`, `survey_stage` | Synthetic Khanapuri Parcha/survey record header |
-| `survey_record_entries` | `survey_record_id`, `parcel_id?`, `raw_payload_json`, `normalized_payload_json` | Survey side of comparison |
-| `comparison_runs` | `case_id`, `rule_set_version`, `input_snapshot_hash`, `status` | Repeatable comparison audit |
-| `findings` | `run_id`, `rule_code`, `severity`, `status`, `subject_ref`, `summary`, `evidence_json` | Potential inconsistencies, never legal decisions |
-| `finding_explanations` | `finding_id`, `language`, `body`, `generator`, `prompt_version`, `review_state` | Grounded AI/template explanation |
-| `guidance_cards` | `finding_id?`, `case_id`, `guidance_code`, `body`, `disclaimer` | Curated informational next actions |
-| `packets` | `case_id`, `packet_type`, `storage_key`, `input_snapshot_hash`, `watermark_version` | Generated mock artifacts |
-| `audit_events` | `case_id`, `actor_id`, `event_type`, `entity_type`, `entity_id`, `metadata_json` | Traceability for edits, reviews, and exports |
+`GovernmentAdapter` is server-only. The sole implementation is `MockGovernmentAdapter`, which derives synthetic process context locally and makes no network request. No official adapter, scraping, credentials, OTP flow, or submission path exists.
 
-Recommended Prisma enums include `DocumentKind`, `SurveyStage`, `RelationshipType`, `ReviewStatus`, `FindingSeverity`, `FindingStatus`, `PacketType`, and `ExtractionStatus`.
+## Evaluation and observability
 
-## API routes
+The 12-case evaluation constructs synthetic document inputs and invokes the production `VerificationService`. Ground truth is declared independently; calculated metrics include correct/incorrect outcomes, FP/FN, and insufficient-evidence classification counts. Metrics are process-local and privacy-minimized; they are not production monitoring.
 
-All routes live beneath `/api/v1`, return JSON `{ data, error?, meta? }`, validate with Zod, and enforce synthetic-only checks. The UI can call server actions internally, but these endpoints remain the integration contract.
+## Current limits
 
-| Method | Route | Responsibility |
-| --- | --- | --- |
-| `POST` | `/cases` | Create a synthetic case |
-| `GET` | `/cases` | List current demo user’s cases |
-| `GET/PATCH` | `/cases/:caseId` | Read/update case metadata and stage |
-| `POST/GET` | `/cases/:caseId/timeline` | Add/list timeline events |
-| `POST/GET` | `/cases/:caseId/people` | Add/list stated people |
-| `POST/GET` | `/cases/:caseId/relationships` | Add/list stated relationships |
-| `POST/GET` | `/cases/:caseId/parcels` | Add/list parcels and identifiers |
-| `POST` | `/cases/:caseId/documents` | Register an allowed synthetic fixture/upload |
-| `GET` | `/cases/:caseId/documents/:documentId` | Document metadata and signed view URL |
-| `POST` | `/documents/:documentId/extractions` | Queue/retry extraction |
-| `GET` | `/documents/:documentId/extractions/latest` | Retrieve validated suggested fields |
-| `PATCH` | `/extracted-fields/:fieldId/review` | Confirm, correct, or reject a field |
-| `GET` | `/cases/:caseId/unified-record` | Provenance-rich case read model |
-| `POST` | `/cases/:caseId/comparisons` | Run deterministic comparison rules |
-| `GET` | `/cases/:caseId/findings` | List findings, evidence, explanations, guidance |
-| `PATCH` | `/findings/:findingId` | Mark a finding reviewed/dismissed with note |
-| `POST/GET` | `/cases/:caseId/survey-records` | Create/list synthetic survey records |
-| `GET` | `/cases/:caseId/guidance` | Curated next-step information |
-| `POST` | `/cases/:caseId/packets` | Generate mock packet |
-| `GET` | `/packets/:packetId` | Packet metadata and download URL |
-| `POST` | `/demo/reset` | Reset the authenticated demo workspace to seed data |
+Implemented: Next.js UI/API, local SQLite persistence, bundled synthetic fixture attachment, optional server-side extraction, deterministic verification, bilingual presentation, guidance, local review packets, and a mock government boundary.
 
-## AI pipeline
+Mocked: all government workflow context and every document/person/parcel fixture.
 
-1. Validate that the document is synthetic and choose a known document schema (legacy record, genealogy, survey record, map metadata, or other demo fixture).
-2. Extract embedded text first; run OCR only when required.
-3. Send only relevant synthetic page text/images to the server-side LLM adapter with a per-document JSON Schema.
-4. Require values, confidence, source citations, and uncertainty. Validate the response with Zod; reject invalid payloads.
-5. Canonicalize values with deterministic functions while preserving source text.
-6. Persist an extraction run, fields, and evidence. Do not automatically promote fields to reviewed facts.
-7. On confirmation, run the comparison engine. Rules include exact/normalized identifier mismatch, area tolerance mismatch, name variation, missing expected relationship, and source-date conflict.
-8. Generate explanations from the finding’s structured evidence only. Use templates when AI is unavailable; prohibit conclusions about ownership/legal validity.
-
-## Folder structure
-
-```text
-bhoomi-check/
-  apps/
-    web/                         # Next.js application
-      app/                       # routes/pages and API handlers
-      components/                # UI components by domain
-      lib/                       # client-safe helpers
-  packages/
-    domain/                      # entities, rules, normalizers, DTOs
-    db/                          # Prisma schema, migrations, seed data
-    ai/                          # provider adapter, schemas, prompts
-    document-processing/         # parser, OCR and fixture adapters
-    packet/                      # mock PDF/print packet generation
-    config/                      # shared lint/TS config
-  fixtures/
-    documents/                   # clearly labelled synthetic inputs
-    cases/                       # case fixture definitions
-  docs/
-  tests/
-    e2e/
-    integration/
-  docker-compose.yml
-  README.md
-```
-
-Start as a pnpm workspace only if packages are introduced immediately. A single `apps/web` project with `src/{domain,server,components}` is acceptable for the first phase; preserve the module boundaries above so extraction and rules can be split later without rewrites.
-
-## Implemented UX foundation (phase 0)
-
-The current prototype is a single Next.js application with route-per-screen navigation. `CaseProvider` owns the transient case state, while `CaseService` is an interface implemented by `MockCaseService`. Screens consume the provider and reusable domain components, never fixture JSON directly. This boundary is the future replacement point for typed API calls and caching.
-
-User-visible language is centralized in `src/lib/i18n.ts`, initially with English and Hindi structures. The app is English-first for this phase, but component strings are designed to move into the locale dictionary as the content layer matures. Screens include a landing page, compact case form, dashboard, documents/field inspection, family relationship view, verification, synthetic survey record, next-action guide, and timeline.
-
-The shell uses semantic headings, labelled navigation, a skip link, keyboard-accessible document inspection, focus styles, responsive touch-friendly controls, and visible loading/empty/error components. It uses no government branding and retains a persistent synthetic-prototype/non-legal notice.
-
-## Case-detail route flow (Phase 1.5 remediation)
-
-Case routes use the URL as the resource identity: `Route (/cases/[caseId]) → CaseProvider → CaseService.getCase(caseId) → Synthetic Case Repository → CaseDetail → UI`. The client provider caches state by case ID (`loading`, `ready`, `not-found`, or `error`) but never selects a global “current” case. The route therefore remains the source of truth and an unknown ID gets a dedicated not-found state.
-
-`CaseDetail` is the single UI input for a selected case. It contains `case`, `family`, `landParcels`, `documents`, `surveyRecord`, `verification`, `nextAction`, and `timeline`. Reusable cards receive the relevant data by props; no case-specific family, survey, guidance, or verification facts are stored in screen components. `MockCaseRepository` supplies two visibly synthetic records (`demo-family-001` and `demo-family-002`) and remains behind `CaseService`, so the future client implementation can replace it with an HTTP API without changing route components.
-
-## Synthetic document workflow (Phase 2)
-
-The Documents route lists only `SyntheticDocumentFixture` items from the service. Selecting a fixture attaches a `DocumentItem` to the current `CaseDetail` with `not-started` status. Explicit user action invokes `CaseService.processDocument`, which delegates to `SyntheticDocumentProcessor`; it deterministically reads labelled lines from the fixture text and emits source-labelled extracted fields. `SyntheticOcrAdapter` is a fixture-only text adapter that preserves the future OCR seam without accepting file uploads or calling external services. The UI renders the original synthetic source text and extraction status/fields, while all mutation remains `UI → CaseProvider → CaseService → MockCaseRepository`.
-
-## Persistence foundation
-
-```mermaid
-flowchart LR
-  UI[Frontend] --> CS[CaseService]
-  CS --> API[Application API]
-  API --> AS[CaseApplicationService]
-  AS --> RI[Repository boundary]
-  RI --> DB[(SQLite)]
-```
-
-The API-backed `CaseService` now reads and creates cases through `/api/cases`. `CaseApplicationService` aggregates persisted relational rows into `CaseDetail`; route components remain unaware of SQLite and API handlers remain unaware of UI composition.
-
-## Deterministic verification (Phase 5)
-
-The selected case follows `Route → CaseService → API → CaseApplicationService → SQLite → CaseDetail`. The case API invokes `VerificationService`, which reads persisted synthetic document records, evaluates `AREA_CONSISTENCY` and `FAMILY_CONTEXT` without an LLM, replaces the case's verification snapshot, and returns it through `CaseDetail.verification`. Each result retains its source document IDs and compared values. Extraction can assist later fact preparation, but it never decides the verification outcome; absent comparable facts become `INSUFFICIENT_EVIDENCE`.
-
-## Citizen-facing verification (Phase 6)
-
-The verification route renders `CaseDetail.verification` only after the persisted deterministic result is loaded. `VerificationSummary` groups `PASS`, `POTENTIAL_ISSUE`, and `INSUFFICIENT_EVIDENCE` into plain-language states. `VerificationDiscrepancyCard` is presentation-only: it receives the rule output plus the selected case's persisted documents, resolves the stored source-document IDs, and displays expected/observed values and the rule evidence. React does not repeat, infer, or alter verification decisions. The data flow is `prepared/extracted synthetic facts → deterministic verification → persisted verification result → citizen-facing evidence and explanation`.
-
-## Guided preparation (Phase 7)
-
-`GuidanceService` derives an ordered `GuidanceItem` list from the current persisted verification results and the selected case's existing synthetic documents. Potential issues map to `READY_TO_REVIEW`, missing evidence maps to `NEEDS_MORE_INFORMATION`, and passes map to `NO_ACTION_NEEDED`. Guidance is returned with the case API as `CaseDetail.guidance`; it is regenerated rather than stored, so derived content cannot drift from a verification rerun. The checklist is browser-local preparation state only. The flow is `verification result → deterministic guidance mapping → CaseDetail.guidance → preparation UI`; it never submits an application or makes a legal conclusion.
-
-## Review packet (Phase 7B)
-
-`ReviewPacketService` creates a persisted synthetic draft only from a selected `POTENTIAL_ISSUE`. The UI may edit citizen notes and clarification wording, then make the one-way `DRAFT → READY_FOR_REVIEW` confirmation. Immutable evidence remains source references and compared values; no submission state or government integration exists.
-
-## Unified case state (Phase 8)
-
-The case API composes a current read model from persisted case rows, deterministic verification, derived guidance, review packets, and an honest timeline. `buildTimeline` adds only states evidenced by stored records—for example available documents, completed verification, detected potential discrepancies, guidance, and packet status. It deliberately does not fabricate “reviewed” activity. This keeps dashboard, timeline, guidance, and packet views aligned with the same selected-case state.
-
-## Bilingual citizen presentation (Phase 9)
-
-`src/lib/i18n.ts` is the single source of citizen-facing English and Hindi copy. `LocaleProvider` persists the selected locale in browser storage, updates the document language, and exposes the selected dictionary through `useTranslation`. The language control changes presentation only; it preserves the route and selected case ID.
-
-For current case reads, the service sends `X-Bhoomi-Locale` to `GET /api/cases/:caseId`. The route handler passes that locale to `GuidanceService`, which localizes titles, explanations, cautions, and checklists while retaining the same result IDs, rule IDs, priorities, statuses, evidence and source-document IDs. Verification remains deterministic and persisted independently of locale. Packet IDs, case IDs, document IDs, Khata/Khesra values, and raw source references are never translated.
-
-Persisted verification and packet rows can contain earlier source-language prose. `localizedVerificationPresentation` and `localizedPacketPresentation` derive display-only templates from immutable rule/category metadata, without modifying stored evidence, compared values, source IDs, packet IDs, statuses, or citizen-authored notes. This keeps an English → Hindi → English switch presentation-only and avoids accidental translation of citizen text.
-
-## Government boundary and workflow configuration (Phase 10)
-
-`GovernmentAdapter` is a server-only boundary with survey status, survey record, and safe-action capabilities. The implemented `MockGovernmentAdapter` derives deterministic data from the selected synthetic case and never makes a network call. `survey-workflow.ts` independently defines the meaning and caution of the synthetic stages; persisted `case.surveyStage` remains domain truth. The case API attaches clearly marked mock process context without making frontend components depend on an adapter.
-
-Extraction prompt content is centralized in `extraction-prompt.ts` with a recorded prompt version. Extraction records retain provider, model, prompt version, timestamp, structured output, and evidence; verification and packets retain their existing rule/result and source-reference lineage.
-
-## Evaluation and lightweight observability (Phase 11)
-
-`src/evaluation` is isolated from citizen product logic and holds synthetic benchmark ground truth, scoring, and deterministic evaluation tests. `npm run eval` runs without OpenAI credentials. `metrics.ts` provides a process-local timing/counter event boundary that stores operation names, outcomes, durations, and minimal IDs only; it is not production monitoring or a citizen analytics feature.
-
-## Testing strategy
-
-- **Unit (Vitest):** normalizers, identifier/area comparisons, rule registry, guidance mapping, schema validation, watermark assertions.
-- **Integration:** Prisma repositories, extraction response validation, provenance persistence, job state transitions, and packet snapshot inputs using a temporary Postgres database.
-- **Contract:** API DTO schemas and LLM JSON schemas; record known synthetic model responses.
-- **UI (Testing Library):** field-review controls, source citations, disclaimer visibility, accessible keyboard flows, and empty/error states.
-- **E2E (Playwright):** seeded case → fixture document → reviewed field → comparison → explanation → mock packet → timeline. Run in AI-stub mode for repeatability.
-- **Visual/manual:** inspect the generated mock packet, mobile breakpoint, bilingual labels, and every consequential disclaimer before demo day.
-
-## Technical risks and mitigations
-
-| Risk | Mitigation |
-| --- | --- |
-| OCR/LLM variability | Known fixtures, schema validation, AI stubs, mandatory review, template fallback |
-| Complex local terminology | Small controlled glossary, source term + plain-language explanation, domain-expert review when possible |
-| Lineage/parcel ambiguity | Model assertions with provenance and uncertainty; never resolve them into legal truth |
-| Scope inflation | One golden scenario, small rule set, fixed document schemas, defer live integrations/maps |
-| Unclear export legality | Mock watermark, fictional format, and explicit non-submission language |
-| Background-job deployment complexity | Job adapter with synchronous/demo implementation before adding Redis |
-| Data leakage | Synthetic-only fixtures, private storage abstraction, redacted logs |
+Future, not implemented: authentication/session tenancy, managed relational storage, object storage, queues/workers, production observability, migrations/backups, live government integration, and government submission. A real-data deployment must add an authenticated principal followed by authorization/case-ownership validation before exposing persistence. The lack of that boundary means this prototype must not be deployed as a shared case system.
