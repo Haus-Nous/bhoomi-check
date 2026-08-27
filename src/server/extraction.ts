@@ -1,4 +1,5 @@
 import { getDatabase } from "@/server/database";
+import { GoogleGenAI } from "@google/genai";
 import OpenAI from "openai";
 import { z } from "zod";
 import type { DocumentExtraction, ExtractedDocument, ExtractionFactKey } from "@/types/case";
@@ -8,9 +9,13 @@ import { measureAsync, metrics } from "@/server/metrics";
 export type PreparedDocument = { documentId: string; caseId: string; documentType: string; text: string; metadata: { filename: string; mimeType: string; section: string }; synthetic: true };
 const factKeys = ["documentType", "personName", "relationship", "khata", "khesra", "recordedArea", "areaUnit", "location", "surveyReference", "recordDate"] as const;
 const extractedDocumentSchema = z.object({ documentType: z.string().min(1), facts: z.array(z.object({ key: z.enum(factKeys), value: z.string().min(1), confidence: z.enum(["low", "medium", "high"]), evidence: z.object({ quote: z.string().min(1), start: z.number().int().nonnegative(), end: z.number().int().positive() }), needsHumanReview: z.boolean(), uncertainty: z.string() })).max(50) }).strict();
+const extractionJsonSchema = { type: "object", additionalProperties: false, properties: { documentType: { type: "string" }, facts: { type: "array", maxItems: 50, items: { type: "object", additionalProperties: false, properties: { key: { type: "string", enum: factKeys }, value: { type: "string" }, confidence: { type: "string", enum: ["low", "medium", "high"] }, evidence: { type: "object", additionalProperties: false, properties: { quote: { type: "string" }, start: { type: "integer", minimum: 0 }, end: { type: "integer", minimum: 1 } }, required: ["quote", "start", "end"] }, needsHumanReview: { type: "boolean" }, uncertainty: { type: "string" } }, required: ["key", "value", "confidence", "evidence", "needsHumanReview", "uncertainty"] } } }, required: ["documentType", "facts"] };
 export class ExtractionValidationError extends Error { constructor(message = "The extraction response was invalid or not grounded in the source document.") { super(message); } }
-export class ExtractionConfigurationError extends Error { constructor() { super("AI extraction is unavailable because OPENAI_API_KEY is not configured."); } }
+export class ExtractionConfigurationError extends Error { constructor() { super("AI extraction is unavailable because the selected provider is not configured."); } }
 export interface ExtractionProvider { readonly name: string; readonly model: string; extract(document: PreparedDocument): Promise<unknown>; }
+export const extractionProviderNames = ["gemini", "openai"] as const;
+export type ExtractionProviderName = (typeof extractionProviderNames)[number];
+export type GeminiClient = { models: { generateContent(input: { model: string; contents: string; config: { systemInstruction: string; responseMimeType: string; responseJsonSchema: unknown } }): Promise<{ text?: string }> } };
 
 export class OpenAIExtractionProvider implements ExtractionProvider {
   readonly name = "openai";
@@ -22,6 +27,17 @@ export class OpenAIExtractionProvider implements ExtractionProvider {
     return JSON.parse(response.output_text);
   }
 }
+
+export class GeminiExtractionProvider implements ExtractionProvider {
+  readonly name = "gemini";
+  readonly model: string;
+  private client: GeminiClient;
+  constructor(apiKey = process.env.GEMINI_API_KEY, model = process.env.GEMINI_EXTRACTION_MODEL || "gemini-2.5-flash", client?: GeminiClient) { if (!apiKey) throw new ExtractionConfigurationError(); this.client = client ?? new GoogleGenAI({ apiKey }); this.model = model; }
+  async extract(document: PreparedDocument) { const response = await this.client.models.generateContent({ model: this.model, contents: document.text, config: { systemInstruction: documentExtractionInstructions, responseMimeType: "application/json", responseJsonSchema: extractionJsonSchema } }); if (!response.text) throw new Error("Empty provider response"); return JSON.parse(response.text); }
+}
+
+export function parseExtractionProvider(provider = process.env.AI_EXTRACTION_PROVIDER): ExtractionProviderName { if (provider === "gemini" || provider === "openai") return provider; throw new ExtractionConfigurationError(); }
+export function resolveExtractionProvider(provider = process.env.AI_EXTRACTION_PROVIDER): ExtractionProvider { const selected = parseExtractionProvider(provider); return selected === "gemini" ? new GeminiExtractionProvider() : new OpenAIExtractionProvider(); }
 
 export function validateExtraction(raw: unknown, sourceText: string): ExtractedDocument {
   const parsed = extractedDocumentSchema.safeParse(raw); if (!parsed.success) throw new ExtractionValidationError();

@@ -24,7 +24,7 @@ This repository is an independent hackathon prototype using synthetic/mock data 
 
 ## Extraction and AI guardrails
 
-OpenAI extraction is optional, server-side, and only applicable to synthetic fixture text. It may suggest structured candidate fields, but accepted fields require schema validation, evidence-span validation, and semantic grounding against labelled source text. The deterministic verification service—not an LLM—decides whether a comparable discrepancy exists.
+Gemini or OpenAI extraction is optional, server-side, and only applicable to synthetic fixture text. The selected provider may suggest structured candidate fields, but accepted fields require schema validation, evidence-span validation, and semantic grounding against labelled source text. The deterministic verification service—not an LLM—decides whether a comparable discrepancy exists.
 
 The application does not send arbitrary user uploads to a model provider because arbitrary uploads are not supported. Provider errors return safe citizen-facing failures without credentials, stack traces, database paths, raw SQL, or provider internals.
 

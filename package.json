@@ -12,6 +12,7 @@
     "eval": "vitest run src/evaluation/evaluation-runner.test.ts --reporter=verbose"
   },
   "dependencies": {
+    "@google/genai": "^2.19.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

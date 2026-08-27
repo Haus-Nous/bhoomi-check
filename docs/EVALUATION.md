@@ -14,7 +14,7 @@ Each fixture explicitly declares input records and expected `AREA_CONSISTENCY` a
 
 ## Extraction metrics
 
-`scoreExpectedFacts` is a deterministic extraction-contract scoring helper: it reports expected facts, matched facts, missing facts, false extractions, and evidence presence. It is not a live OpenAI extraction-accuracy benchmark. Runtime extraction tests separately validate semantic evidence grounding, malformed output rejection, provider failure, missing configuration, prompt-version retention, and metric outcomes. No live model call runs in CI.
+`scoreExpectedFacts` is a deterministic extraction-contract scoring helper: it reports expected facts, matched facts, missing facts, false extractions, and evidence presence. It is not a live Gemini or OpenAI extraction-accuracy benchmark. Runtime extraction tests separately validate semantic evidence grounding, malformed output rejection, provider failure, missing configuration, prompt-version retention, and metric outcomes. No live model call runs in CI.
 
 ## Verification metrics
 
@@ -26,7 +26,7 @@ The evaluation rejects prohibited claim phrases in citizen-facing template check
 
 ## Robustness scenarios
 
-Existing and evaluation tests cover malformed model output, unsupported facts, provider failure, missing OpenAI configuration, invalid case IDs, cross-case packet source, invalid packet body, insufficient evidence, and unsupported packet state transitions.
+Existing and evaluation tests cover malformed model output, unsupported facts, provider failure, explicit Gemini/OpenAI selection and missing selected-provider configuration, invalid case IDs, cross-case packet source, invalid packet body, insufficient evidence, and unsupported packet state transitions.
 
 ## Observability
 

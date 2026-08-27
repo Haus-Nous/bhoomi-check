@@ -32,7 +32,7 @@ If a required fact is absent, malformed, or not comparable, the outcome is `INSU
 
 ## AI and extraction boundary
 
-Document extraction is optional and server-side. When configured, an OpenAI provider may propose structured candidate facts. The application accepts a candidate only after schema, source-span, and semantic-grounding checks; otherwise it stores no accepted fact. Demo fixtures use controlled synthetic extraction behaviour. An LLM never determines verification status, legal ownership, or the next legal outcome.
+Document extraction is optional and server-side. When explicitly configured, a Gemini or OpenAI provider may propose structured candidate facts. The application accepts a candidate only after schema, source-span, and semantic-grounding checks; otherwise it stores no accepted fact. Demo fixtures use controlled synthetic extraction behaviour. An LLM never determines verification status, legal ownership, or the next legal outcome.
 
 ## Language behaviour
 

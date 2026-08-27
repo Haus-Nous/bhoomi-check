@@ -8,13 +8,13 @@ flowchart TD
   API --> APP[Application services]
   APP --> DB[(SQLite locally / Supabase Postgres when hosted)]
   APP --> EXT[Extraction service]
-  EXT --> OAI[OpenAI provider, optional]
+  EXT --> AI[Configured Gemini or OpenAI provider, optional]
   APP --> VER[Deterministic verification]
   APP --> GOV[GovernmentAdapter]
   GOV --> MOCK[MockGovernmentAdapter\nsynthetic data only]
 ```
 
-The current prototype uses a server-side persistence adapter: local development uses SQLite, while the hosted Vercel demo uses Supabase Postgres through a server-only connection string. A packet is a local MOCK preparation record; `READY_FOR_REVIEW` freezes that record and never submits or exports it. Deterministic verification operates over stored synthetic records. OpenAI extraction is optional, server-side only, and uses a versioned structured-output prompt. The only government boundary implemented is `MockGovernmentAdapter`; it is deterministic, performs no network calls, and labels every result as synthetic and non-official.
+The current prototype uses a server-side persistence adapter: local development uses SQLite, while the hosted Vercel demo uses Supabase Postgres through a server-only connection string. A packet is a local MOCK preparation record; `READY_FOR_REVIEW` freezes that record and never submits or exports it. Deterministic verification operates over stored synthetic records. Gemini (recommended for the demo) and OpenAI are optional server-side extraction providers using a shared versioned structured-output trust boundary. The only government boundary implemented is `MockGovernmentAdapter`; it is deterministic, performs no network calls, and labels every result as synthetic and non-official.
 
 `GovernmentAdapter` is an interface for future approved integrations. No `OfficialGovernmentAdapter`, portal integration, scraping, reverse engineering, OTP workflow, credential use, or submission behavior exists in this repository.
 

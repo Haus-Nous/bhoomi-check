@@ -19,7 +19,7 @@ The hero case (`demo-family-001`) demonstrates an area mismatch and a family-con
 
 ## AI and verification
 
-OpenAI extraction is optional and server-side. It proposes structured candidate facts only; accepted facts require schema validation, exact evidence spans, and deterministic semantic grounding. It does not decide a discrepancy, ownership, inheritance, or legal outcome.
+AI extraction is optional and server-side. Set `AI_EXTRACTION_PROVIDER=gemini` (recommended for the demo) or `openai`; each proposes structured candidate facts only. Accepted facts require common schema validation, exact evidence spans, and deterministic semantic grounding. It does not decide a discrepancy, ownership, inheritance, or legal outcome.
 
 `VerificationService` makes deterministic area and family-context decisions. It returns `PASS`, `POTENTIAL_ISSUE`, or `INSUFFICIENT_EVIDENCE`; malformed or missing evidence is never turned into a discrepancy.
 
@@ -43,20 +43,21 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`. No OpenAI key is needed for case creation, fixture attachment, deterministic verification, tests, evaluation, or the build.
+Open `http://localhost:3000`. No AI-provider key is needed for case creation, fixture attachment, deterministic verification, tests, evaluation, or the build.
 
-To enable optional live extraction only, set server-side environment configuration:
+To enable optional live extraction only, select exactly one server-side provider:
 
 ```bash
-OPENAI_API_KEY=...
-OPENAI_EXTRACTION_MODEL=gpt-4.1-mini
+AI_EXTRACTION_PROVIDER=gemini
+GEMINI_API_KEY=...
+GEMINI_EXTRACTION_MODEL=gemini-2.5-flash
 ```
 
 ## Demo
 
 1. Start the app and open `http://localhost:3000`.
 2. Select **Explore demo case** to enter Demo Case 001; no identifier entry is required.
-3. Open **Documents** and choose **Inspect fields** to read synthetic source text and quoted extraction evidence. Live extraction is optional: without `OPENAI_API_KEY`, the rest of the demo continues and the extraction screen reports a safe unavailable state.
+3. Open **Documents** and choose **Inspect fields** to read synthetic source text and quoted extraction evidence. Live extraction is optional: without a key for the explicitly selected provider, the rest of the demo continues and the extraction screen reports a safe unavailable state.
 4. Open **Survey record**, then **Check records**. The hero case shows `AREA_CONSISTENCY = POTENTIAL_ISSUE` and `FAMILY_CONTEXT = POTENTIAL_ISSUE`, each with source document IDs and compared values.
 5. Continue to **Next step**, prepare a local MOCK review packet, and show the **Timeline**.
 6. Return home and select **Reset demo case** to restore Demo Case 001 for another run. Reset is limited to the two bundled seed cases and never deletes a newly created case.
@@ -64,7 +65,7 @@ OPENAI_EXTRACTION_MODEL=gpt-4.1-mini
 
 ## Deployment
 
-Local development uses Node SQLite. The hosted hackathon demo uses Vercel route handlers with server-side Supabase Postgres configured through `DATABASE_URL`. Supabase is database infrastructure only: this prototype does not implement Supabase Auth, browser database access, or production multi-user controls. Optional OpenAI extraction is not required for the demo. See [deployment notes](docs/DEPLOYMENT.md).
+Local development uses Node SQLite. The hosted hackathon demo uses Vercel route handlers with server-side Supabase Postgres configured through `DATABASE_URL`. Supabase is database infrastructure only: this prototype does not implement Supabase Auth, browser database access, or production multi-user controls. Optional Gemini or OpenAI extraction is not required for the demo. See [deployment notes](docs/DEPLOYMENT.md).
 
 ## Checks
 

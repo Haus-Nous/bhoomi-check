@@ -10,7 +10,7 @@ flowchart LR
   APP --> DB[(SQLite locally / Supabase Postgres when hosted)]
   APP --> PREP[PreparedDocument]
   PREP --> EXT[Optional ExtractionService]
-  EXT --> OAI[OpenAI provider when configured]
+  EXT --> AI[Configured Gemini or OpenAI provider]
   APP --> VER[VerificationService]
   VER --> GUIDE[GuidanceService]
   GUIDE --> PACKET[ReviewPacketService]
