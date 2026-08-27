@@ -7,7 +7,7 @@ flowchart LR
   UI[Citizen UI] --> CS[CaseService]
   CS --> API[Next.js API routes]
   API --> APP[Application / domain services]
-  APP --> DB[(Local SQLite: synthetic data)]
+  APP --> DB[(SQLite locally / Supabase Postgres when hosted)]
   APP --> PREP[PreparedDocument]
   PREP --> EXT[Optional ExtractionService]
   EXT --> OAI[OpenAI provider when configured]
@@ -18,7 +18,7 @@ flowchart LR
   GOV --> MOCK[MockGovernmentAdapter]
 ```
 
-The selected route is the case identity. UI components consume `CaseDetail`; they do not read SQLite or fixture files directly. The client `CaseService` calls typed case-scoped API routes. `PROTOTYPE_MODE = "synthetic-demo"` constrains new synthetic case inputs and approved fixture selection before persistence. Application services assemble persisted synthetic rows, deterministic verification, derived guidance, packets, and honest timeline state into the response.
+The selected route is the case identity. UI components consume `CaseDetail`; they do not read SQLite, Postgres, or fixture files directly. The client `CaseService` calls typed case-scoped API routes. `PROTOTYPE_MODE = "synthetic-demo"` constrains new synthetic case inputs and approved fixture selection before persistence. Application services assemble persisted synthetic rows, deterministic verification, derived guidance, packets, and honest timeline state into the response.
 
 ## Document and verification flow
 

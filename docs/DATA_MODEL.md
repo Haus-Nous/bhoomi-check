@@ -2,7 +2,7 @@
 
 ## Persisted local prototype state
 
-Node SQLite stores synthetic case aggregates in `data/bhoomi-check.sqlite`, which is ignored by Git.
+Local development stores synthetic case aggregates in Node SQLite at `data/bhoomi-check.sqlite`, which is ignored by Git. Hosted Vercel requests use the identical aggregate-table model in Supabase Postgres, initialized by `supabase/schema.sql`.
 
 | State | Persistence | Notes |
 | --- | --- | --- |
@@ -27,4 +27,4 @@ The controlled demo reset deletes and recreates state only for the two server-de
 
 `survey-workflow.ts` and `MockGovernmentAdapter` are server-side configuration/boundaries, not government data. `MockGovernmentAdapter` derives clearly synthetic workflow context and makes no network call.
 
-The database is a local single-process prototype adapter in the `synthetic-demo` profile. New cases use `DEMO-...` identifiers and labelled synthetic text; documents must originate from the server-side fixture registry. It has no user/session tenancy, production migrations, managed backups, object storage, background workers, or production audit logging. Only synthetic data belongs in it.
+The database adapter selects local SQLite without `DATABASE_URL` and server-side Supabase Postgres when it is configured. Browser components never receive a database credential. This synthetic-demo prototype has no user/session tenancy, production migrations, managed backups, object storage, background workers, or production audit logging. Only synthetic data belongs in it.

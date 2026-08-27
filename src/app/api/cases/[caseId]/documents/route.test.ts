@@ -5,12 +5,12 @@ import { GET as getDocument } from "@/app/api/cases/[caseId]/documents/[document
 import { caseApplicationService } from "@/server/case-application-service";
 
 const params = (caseId: string) => ({ params: Promise.resolve({ caseId }) });
-const create = (suffix: string) => caseApplicationService.createCase({ district: "Demo District", circle: "Demo Circle", village: "Demo Mauza", khata: `DEMO-ATTACH-${suffix}`, nickname: `Synthetic attachment ${suffix}` });
+const create = async (suffix: string) => await caseApplicationService.createCase({ district: "Demo District", circle: "Demo Circle", village: "Demo Mauza", khata: `DEMO-ATTACH-${suffix}`, nickname: `Synthetic attachment ${suffix}` });
 
 describe("synthetic document attachment", () => {
   it("persists an approved fixture only in the selected new case", async () => {
-    const first = create(crypto.randomUUID().slice(0, 8));
-    const second = create(crypto.randomUUID().slice(0, 8));
+    const first = await create(crypto.randomUUID().slice(0, 8));
+    const second = await create(crypto.randomUUID().slice(0, 8));
     const firstId = first.case.id;
     const secondId = second.case.id;
 
@@ -32,12 +32,12 @@ describe("synthetic document attachment", () => {
 
     const reloaded = await GET(new Request(`http://localhost/api/cases/${firstId}/documents`), params(firstId));
     expect((await reloaded.json() as { data: { id: string }[] }).data).toEqual([expect.objectContaining({ id: `${firstId}-fixture-legacy-a` })]);
-    expect(caseApplicationService.getCaseDetail(secondId)?.documents).toEqual([]);
+    expect((await caseApplicationService.getCaseDetail(secondId))?.documents).toEqual([]);
   });
 
   it("rejects arbitrary attachment bodies, unknown fixtures, and cross-case document access", async () => {
-    const first = create(crypto.randomUUID().slice(0, 8));
-    const second = create(crypto.randomUUID().slice(0, 8));
+    const first = await create(crypto.randomUUID().slice(0, 8));
+    const second = await create(crypto.randomUUID().slice(0, 8));
     const invalid = await POST(new Request(`http://localhost/api/cases/${first.case.id}/documents`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fixtureId: `${second.case.id}-fixture-legacy-a` }) }), params(first.case.id));
     expect(invalid.status).toBe(400);
 

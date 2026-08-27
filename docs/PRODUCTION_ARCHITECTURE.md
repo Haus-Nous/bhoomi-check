@@ -6,7 +6,7 @@
 flowchart TD
   UI[Citizen web UI] --> API[Next.js route handlers]
   API --> APP[Application services]
-  APP --> DB[(Local SQLite)]
+  APP --> DB[(SQLite locally / Supabase Postgres when hosted)]
   APP --> EXT[Extraction service]
   EXT --> OAI[OpenAI provider, optional]
   APP --> VER[Deterministic verification]
@@ -14,7 +14,7 @@ flowchart TD
   GOV --> MOCK[MockGovernmentAdapter\nsynthetic data only]
 ```
 
-The current prototype is a local Next.js application. Case, document, extraction, verification, packet, and timeline data are held in a local SQLite file excluded from Git. A packet is a local MOCK preparation record; `READY_FOR_REVIEW` freezes that local record and never submits or exports it. Deterministic verification operates over stored synthetic records. OpenAI extraction is optional, server-side only, and uses a versioned structured-output prompt. The only government boundary implemented is `MockGovernmentAdapter`; it is deterministic, performs no network calls, and labels every result as synthetic and non-official.
+The current prototype uses a server-side persistence adapter: local development uses SQLite, while the hosted Vercel demo uses Supabase Postgres through a server-only connection string. A packet is a local MOCK preparation record; `READY_FOR_REVIEW` freezes that record and never submits or exports it. Deterministic verification operates over stored synthetic records. OpenAI extraction is optional, server-side only, and uses a versioned structured-output prompt. The only government boundary implemented is `MockGovernmentAdapter`; it is deterministic, performs no network calls, and labels every result as synthetic and non-official.
 
 `GovernmentAdapter` is an interface for future approved integrations. No `OfficialGovernmentAdapter`, portal integration, scraping, reverse engineering, OTP workflow, credential use, or submission behavior exists in this repository.
 
@@ -45,7 +45,7 @@ Future access control, tenant isolation, backups/recovery testing, retention pol
 
 ## SQLite and deployment limitation
 
-SQLite is the local prototype persistence adapter. For the controlled hackathon demo only, it may run on one long-lived Node.js instance with a writable persistent `data/` volume; state survives only while that volume is retained. It is not compatible with edge runtime, ephemeral/read-only filesystem, or uncoordinated multi-instance deployment. It is not presented as production-scale infrastructure. The repository/application service boundary allows a future managed relational adapter without coupling citizen UI components to the database. Object storage, queues, multi-instance locking, backups, and production access control are future work. See `docs/DEPLOYMENT.md`.
+SQLite is the local development/test adapter only. Hosted Vercel requests use Supabase Postgres through the same server-side adapter boundary; Vercel without a configured database fails safely rather than relying on its filesystem. This synthetic demo remains unsuitable for real-data production: authentication, authorization, case ownership, real-data controls, durable audit logging, and approved government integrations remain future work. See `docs/DEPLOYMENT.md`.
 
 ## Upload safety boundary
 

@@ -1,11 +1,8 @@
-import { DatabaseSync } from "node:sqlite";
-import { existsSync } from "node:fs";
-import { join } from "node:path";
 import { documentApplicationService } from "@/server/document-application-service";
+import { getDatabase } from "@/server/database";
 import type { DocumentItem, VerificationItem } from "@/types/case";
-import { measure, metrics } from "@/server/metrics";
+import { measureAsync, metrics } from "@/server/metrics";
 
-const dbPath = join(process.cwd(), "data", "bhoomi-check.sqlite");
 const normalizeName = (value: string) => value.toLowerCase().replace(/[\s.,_-]+/g, "").trim();
 const labelledValues = (text: string, label: string) => [...text.matchAll(new RegExp(`^${label}:\\s*(.+)$`, "gim"))].map((match) => match[1]?.trim()).filter((value): value is string => Boolean(value));
 
@@ -33,7 +30,7 @@ const insufficientArea = (caseId: string, sourceDocumentIds: string[]): Verifica
 const insufficientFamily = (caseId: string, sourceDocumentIds: string[]): VerificationItem => ({ id: `${caseId}-family-evidence`, ruleId: "FAMILY_CONTEXT", outcome: "INSUFFICIENT_EVIDENCE", title: "Family-context comparison needs more evidence", detail: "Potential family-context comparison could not be completed because a required synthetic comparison subject or holder value is missing.", status: "review", confidence: 0, evidence: "INSUFFICIENT_EVIDENCE · Family comparison subject and survey holder", sourceDocumentIds });
 
 export class VerificationService {
-  run(caseId: string): VerificationItem[] | null { return measure(metrics, "verification", () => this.runDeterministic(caseId), { caseId, synthetic: true }); }
+  async run(caseId: string): Promise<VerificationItem[] | null> { return measureAsync(metrics, "verification", () => this.runDeterministic(caseId), { caseId, synthetic: true }); }
 
   evaluateDocuments(caseId: string, docs: DocumentItem[]): VerificationItem[] {
     const historical = docs.find((document) => document.id.endsWith("historical")) ?? docs.find((document) => document.kind === "legacy-record" && document.id !== `${caseId}-document`);
@@ -63,20 +60,16 @@ export class VerificationService {
     return results;
   }
 
-  private runDeterministic(caseId: string): VerificationItem[] | null {
-    if (!existsSync(dbPath)) return null;
-    documentApplicationService.ensureSeedDocuments();
-    const docs = documentApplicationService.list(caseId);
+  private async runDeterministic(caseId: string): Promise<VerificationItem[] | null> {
+    await documentApplicationService.ensureSeedDocuments();
+    const docs = await documentApplicationService.list(caseId);
     if (!docs.length) return null;
     const results = this.evaluateDocuments(caseId, docs);
-    const db = new DatabaseSync(dbPath);
-    db.prepare("DELETE FROM verification_results WHERE case_id = ?").run(caseId);
-    for (const item of results) db.prepare("INSERT INTO verification_results (id,case_id,payload) VALUES (?,?,?)").run(item.id, caseId, JSON.stringify(item));
-    db.close();
+    await getDatabase().transaction([{ sql: "DELETE FROM verification_results WHERE case_id = ?", params: [caseId] }, ...results.map((item) => ({ sql: "INSERT INTO verification_results (id,case_id,payload) VALUES (?,?,?)", params: [item.id, caseId, JSON.stringify(item)] }))]);
     return results;
   }
 
-  list(caseId: string) { if (!existsSync(dbPath)) return []; const db = new DatabaseSync(dbPath); const rows = db.prepare("SELECT payload FROM verification_results WHERE case_id = ?").all(caseId) as { payload: string }[]; db.close(); return rows.map((row) => JSON.parse(row.payload) as VerificationItem); }
+  async list(caseId: string) { await getDatabase().initialize(); const rows = await getDatabase().query<{ payload: string }>({ sql: "SELECT payload FROM verification_results WHERE case_id = ?", params: [caseId] }); return rows.map((row) => JSON.parse(row.payload) as VerificationItem); }
 }
 
 export const verificationService = new VerificationService();

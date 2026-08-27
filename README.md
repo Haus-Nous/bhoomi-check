@@ -62,9 +62,9 @@ OPENAI_EXTRACTION_MODEL=gpt-4.1-mini
 6. Return home and select **Reset demo case** to restore Demo Case 001 for another run. Reset is limited to the two bundled seed cases and never deletes a newly created case.
 7. To show the control, open `/cases/demo-family-002`. It returns `AREA_CONSISTENCY = PASS` and `FAMILY_CONTEXT = INSUFFICIENT_EVIDENCE`.
 
-## Controlled demo deployment
+## Deployment
 
-Deploy only to a long-lived Node.js host with a writable **persistent** volume mounted at the application `data/` directory. The current Node SQLite adapter requires both the Node runtime and that durable writable path; serverless/edge runtimes or ephemeral filesystem deployments are unsuitable because case, packet, and timeline changes will be lost or may fail. See [deployment notes](docs/DEPLOYMENT.md).
+Local development uses Node SQLite. The hosted hackathon demo uses Vercel route handlers with server-side Supabase Postgres configured through `DATABASE_URL`. Supabase is database infrastructure only: this prototype does not implement Supabase Auth, browser database access, or production multi-user controls. Optional OpenAI extraction is not required for the demo. See [deployment notes](docs/DEPLOYMENT.md).
 
 ## Checks
 

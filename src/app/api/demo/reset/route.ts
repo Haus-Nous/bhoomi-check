@@ -11,8 +11,8 @@ const resetSchema = z.object({ caseId: z.enum(["demo-family-001", "demo-family-0
 export async function POST(request: Request) {
   const body = resetSchema.safeParse(await request.json().catch(() => null));
   if (!body.success) return NextResponse.json({ error: { code: "INVALID_DEMO_CASE", message: "Choose an approved synthetic demo case to reset." } }, { status: 400 });
-  const detail = caseApplicationService.resetSeedCase(body.data.caseId);
+  const detail = await caseApplicationService.resetSeedCase(body.data.caseId);
   if (!detail) return NextResponse.json({ error: { code: "DEMO_CASE_NOT_FOUND", message: "That synthetic demo case is not available." } }, { status: 404 });
-  documentApplicationService.ensureSeedDocuments();
+  await documentApplicationService.ensureSeedDocuments();
   return NextResponse.json({ data: { caseId: detail.case.id, reset: true } });
 }
