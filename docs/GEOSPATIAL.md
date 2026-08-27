@@ -12,9 +12,11 @@ BhoomiCheck persists one clearly fictional GeoJSON `Polygon` for each seeded dem
 
 `parcel_geometries` stores portable text GeoJSON in both SQLite and Supabase Postgres. No PostGIS runtime is required. Geometry is resolved by both `case_id` and `parcel_id`; no client-supplied geometry ID is accepted. Seed creation and demo reset are idempotent, and new synthetic cases intentionally have no geometry.
 
+The Phase 16A hero seed (`demo-family-001-geometry`) is versioned through its source reference (`BHOOMICHECK-SYNTHETIC-GEO-001-V2`). At initialization, BhoomiCheck replaces only the exact known Phase 16 polygon JSON for that exact synthetic geometry id, case, parcel, and source type. This safely corrects an existing demo row without changing user-created geometry, the control demo, or any non-matching row. Repeated initialization makes no further change.
+
 ## Map boundary
 
-`ParcelMap` is a client-side MapLibre visualization using the public no-key MapLibre demo style. It receives geometry from the case-scoped parcel-intelligence API. Geometry calculation is independent of the basemap. A future `BasemapProvider` may change visualization, while a future `ImageryProvider` may add context; neither changes geometry or its deterministic calculation.
+`ParcelMap` is a client-side MapLibre visualization using an explicit public, no-key OpenStreetMap raster style. It receives geometry from the case-scoped parcel-intelligence API, places the GeoJSON source and synthetic fill/outline in the initial style, synchronizes that source after the style is ready, and fits the viewport to the submitted geometry. A pointer-transparent SVG overlay is projected from the same GeoJSON after map movement and resize so the synthetic boundary remains legible over an empty-ocean basemap. Navigation controls and attribution remain enabled. If background tiles fail, the parcel overlay and textual intelligence remain available; a total MapLibre initialization failure shows a safe textual fallback. Geometry calculation is independent of the basemap. A future `BasemapProvider` may change visualization, while a future `ImageryProvider` may add context; neither changes geometry or its deterministic calculation.
 
 ## Future integration boundary
 

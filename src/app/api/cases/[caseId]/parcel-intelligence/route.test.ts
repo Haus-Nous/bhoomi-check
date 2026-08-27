@@ -7,11 +7,13 @@ const params = (caseId: string) => ({ params: Promise.resolve({ caseId }) });
 describe("parcel intelligence API", () => {
   it("returns the isolated hero geometry and contextual recorded areas", async () => {
     const response = await GET(new Request("http://localhost"), params("demo-family-001"));
-    const body = await response.json() as { data: { parcel: { khata: string; khesra?: string }; geometry: { caseId: string; provenance: string } | null; calculatedArea: { squareMeters: number; provenance: string } | null; recordedAreas: { historical: { value: number } | null; survey: { value: number } | null } } };
+    const body = await response.json() as { data: { parcel: { khata: string; khesra?: string }; geometry: { caseId: string; provenance: string; sourceReference: string } | null; calculatedArea: { squareMeters: number; acres: number; provenance: string } | null; recordedAreas: { historical: { value: number } | null; survey: { value: number } | null } } };
     expect(response.status).toBe(200);
     expect(body.data.parcel).toMatchObject({ khata: "DEMO-128", khesra: "DEMO-456" });
-    expect(body.data.geometry).toMatchObject({ caseId: "demo-family-001", provenance: "SYNTHETIC" });
+    expect(body.data.geometry).toMatchObject({ caseId: "demo-family-001", provenance: "SYNTHETIC", sourceReference: "BHOOMICHECK-SYNTHETIC-GEO-001-V2" });
     expect(body.data.calculatedArea).toMatchObject({ provenance: "CALCULATED_FROM_GEOMETRY" });
+    expect(body.data.calculatedArea?.acres).toBeGreaterThanOrEqual(1.02);
+    expect(body.data.calculatedArea?.acres).toBeLessThanOrEqual(1.03);
     expect(body.data.recordedAreas).toEqual({ historical: { value: 1.2, unit: "acre" }, survey: { value: 1.02, unit: "acre" } });
   });
 

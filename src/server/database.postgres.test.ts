@@ -20,6 +20,11 @@ class MockPostgresClient implements PostgresClient {
     if (query.startsWith("CREATE ") || query.startsWith("SELECT 1")) return query.startsWith("SELECT 1") ? [{ ok: 1 }] : [];
     const selectId = query.match(/^SELECT id FROM (\w+) WHERE id = \$1$/);
     if (selectId) return this.table(selectId[1]!).has(String(params[0])) ? [{ id: params[0] }] : [];
+    if (query.startsWith("UPDATE parcel_geometries SET geometry_json = $1, source_reference = $2, updated_at = $3 WHERE id = $4")) {
+      const row = this.table("parcel_geometries").get(String(params[3]));
+      if (row && row.case_id === params[4] && row.parcel_id === params[5] && row.source_type === params[6] && row.geometry_json === params[7]) Object.assign(row, { geometry_json: params[0], source_reference: params[1], updated_at: params[2] });
+      return [];
+    }
     const selectCase = query.match(/^SELECT payload FROM (\w+) WHERE case_id = \$1$/);
     if (selectCase) return [...this.table(selectCase[1]!).values()].filter((row) => row.case_id === params[0]).map((row) => ({ payload: row.payload }));
     const selectIdPayload = query.match(/^SELECT payload FROM (\w+) WHERE id = \$1$/);
@@ -67,6 +72,11 @@ describe("SupabasePostgresAdapter", () => {
     expect(hero?.case.nickname).toBe("Demo Case 001");
     expect(control?.case.nickname).toBe("Demo Case 002");
     expect(await parcelGeometryService.getForParcel("demo-family-001", "demo-family-001-parcel", "DEMO-128", "DEMO-456")).toMatchObject({ id: "demo-family-001-geometry", provenance: "SYNTHETIC" });
+    const oldHero = client.tables.get("parcel_geometries")?.get("demo-family-001-geometry");
+    if (!oldHero) throw new Error("Expected the synthetic hero geometry to be seeded.");
+    oldHero.geometry_json = JSON.stringify({ type: "Polygon", coordinates: [[[0, 0], [0.0005, 0], [0.0005, 0.0005], [0, 0.0005], [0, 0]]] });
+    await parcelGeometryService.ensureSeedGeometries();
+    expect(await parcelGeometryService.getForParcel("demo-family-001", "demo-family-001-parcel", "DEMO-128", "DEMO-456")).toMatchObject({ geometry: { coordinates: [[[0, 0], [0.000579, 0], [0.000579, 0.000579], [0, 0.000579], [0, 0]]] } });
 
     await documentApplicationService.ensureSeedDocuments();
     const documents = await documentApplicationService.list("demo-family-001");
