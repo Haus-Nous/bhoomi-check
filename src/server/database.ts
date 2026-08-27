@@ -1,4 +1,4 @@
-import postgres, { type Sql } from "postgres";
+import postgres from "postgres";
 
 export type SqlValue = string | number | boolean | null;
 export type SqlStatement = { sql: string; params?: SqlValue[] };
@@ -11,6 +11,14 @@ export interface DatabaseAdapter {
   execute(statement: SqlStatement): Promise<void>;
   transaction(statements: SqlStatement[]): Promise<void>;
   ping(): Promise<void>;
+}
+
+export interface PostgresQueryClient {
+  unsafe(query: string, params?: SqlValue[]): PromiseLike<unknown>;
+}
+
+export interface PostgresClient extends PostgresQueryClient {
+  begin<T>(callback: (transaction: PostgresQueryClient) => Promise<T>): Promise<T>;
 }
 
 const schema = [
@@ -31,7 +39,10 @@ const schema = [
   "CREATE INDEX IF NOT EXISTS extraction_document_id ON document_extractions(case_id, document_id, created_at)",
 ];
 
-const postgresSql = (sql: string) => sql.replace(/\?/g, (_, offset: number, text: string) => `$${text.slice(0, offset).match(/\?/g)?.length! + 1}`);
+export const postgresSql = (sql: string) => {
+  let parameter = 0;
+  return sql.replace(/\?/g, () => `$${++parameter}`);
+};
 
 class LocalSqliteAdapter implements DatabaseAdapter {
   readonly kind = "sqlite" as const;
@@ -45,11 +56,12 @@ class LocalSqliteAdapter implements DatabaseAdapter {
   async ping() { await this.initialize(); await this.query({ sql: "SELECT 1 AS ok" }); }
 }
 
-class SupabasePostgresAdapter implements DatabaseAdapter {
+export class SupabasePostgresAdapter implements DatabaseAdapter {
   readonly kind = "postgres" as const;
-  private client: Sql | undefined;
+  private client: PostgresClient | undefined;
   private initialized: Promise<void> | undefined;
-  private sql() { if (!this.client) this.client = postgres(process.env.DATABASE_URL!, { prepare: false, max: 1, idle_timeout: 10, connect_timeout: 10 }); return this.client; }
+  constructor(client?: PostgresClient) { this.client = client; }
+  private sql() { if (!this.client) this.client = postgres(process.env.DATABASE_URL!, { prepare: false, max: 1, idle_timeout: 10, connect_timeout: 10 }) as unknown as PostgresClient; return this.client; }
   async initialize() { if (!this.initialized) this.initialized = (async () => { for (const item of schema) await this.sql().unsafe(item); })(); return this.initialized; }
   async query<T extends Record<string, unknown>>({ sql, params = [] }: SqlStatement) { return await this.sql().unsafe(postgresSql(sql), params) as T[]; }
   async execute(statement: SqlStatement) { await this.query(statement); }
@@ -65,3 +77,4 @@ export function getDatabase(): DatabaseAdapter {
   return adapter = new LocalSqliteAdapter();
 }
 export function resetDatabaseForTests() { adapter = undefined; }
+export function setDatabaseForTests(value: DatabaseAdapter | undefined) { adapter = value; }
