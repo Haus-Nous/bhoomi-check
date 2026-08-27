@@ -19,9 +19,12 @@ describe("parcel intelligence API", () => {
 
   it("keeps the control geometry isolated and gives new cases a safe geometry empty state", async () => {
     const control = await GET(new Request("http://localhost"), params("demo-family-002"));
-    const controlBody = await control.json() as { data: { parcel: { khata: string }; geometry: { id: string; caseId: string } | null } };
+    const controlBody = await control.json() as { data: { parcel: { khata: string; khesra?: string }; geometry: { id: string; caseId: string; provenance: string; sourceReference: string } | null; calculatedArea: { acres: number } | null } };
     expect(controlBody.data.parcel.khata).toBe("DEMO-902");
-    expect(controlBody.data.geometry).toMatchObject({ id: "demo-family-002-geometry", caseId: "demo-family-002" });
+    expect(controlBody.data.parcel.khesra).toBe("DEMO-114");
+    expect(controlBody.data.geometry).toMatchObject({ id: "demo-family-002-geometry", caseId: "demo-family-002", provenance: "SYNTHETIC", sourceReference: "BHOOMICHECK-SYNTHETIC-GEO-002" });
+    expect(controlBody.data.calculatedArea?.acres).toBeGreaterThanOrEqual(1.24);
+    expect(controlBody.data.calculatedArea?.acres).toBeLessThanOrEqual(1.26);
     const created = await caseApplicationService.createCase({ district: "Demo District", circle: "Demo Circle", village: "Demo Mauza", khata: "DEMO-GEO-NEW-001", nickname: "Synthetic unmapped case" });
     const fresh = await GET(new Request("http://localhost"), params(created.case.id));
     const freshBody = await fresh.json() as { data: { geometry: null; calculatedArea: null } };

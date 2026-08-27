@@ -78,6 +78,12 @@ describe("SupabasePostgresAdapter", () => {
     await parcelGeometryService.ensureSeedGeometries();
     expect(await parcelGeometryService.getForParcel("demo-family-001", "demo-family-001-parcel", "DEMO-128", "DEMO-456")).toMatchObject({ geometry: { coordinates: [[[0, 0], [0.000579, 0], [0.000579, 0.000579], [0, 0.000579], [0, 0]]] } });
 
+    const oldControl = client.tables.get("parcel_geometries")?.get("demo-family-002-geometry");
+    if (!oldControl) throw new Error("Expected the synthetic control geometry to be seeded.");
+    oldControl.geometry_json = JSON.stringify({ type: "Polygon", coordinates: [[[0.01, 0.01], [0.01035, 0.01], [0.01035, 0.01035], [0.01, 0.01035], [0.01, 0.01]]] });
+    await parcelGeometryService.ensureSeedGeometries();
+    expect(await parcelGeometryService.getForParcel("demo-family-002", "demo-family-002-parcel", "DEMO-902", "DEMO-114")).toMatchObject({ geometry: { coordinates: [[[0.01, 0.01], [0.01064, 0.01], [0.01064, 0.01064], [0.01, 0.01064], [0.01, 0.01]]] }, sourceReference: "BHOOMICHECK-SYNTHETIC-GEO-002" });
+
     await documentApplicationService.ensureSeedDocuments();
     const documents = await documentApplicationService.list("demo-family-001");
     expect(documents.find((document) => document.id.endsWith("historical"))?.sourceText).toContain("1.20 acre");

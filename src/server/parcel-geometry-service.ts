@@ -11,10 +11,12 @@ const syntheticGeometry = (id: string, caseId: string, parcelId: string, khataId
 
 const oldHeroGeometry: ParcelGeoJson = { type: "Polygon", coordinates: [[[0, 0], [0.0005, 0], [0.0005, 0.0005], [0, 0.0005], [0, 0]]] };
 const correctedHeroGeometry: ParcelGeoJson = { type: "Polygon", coordinates: [[[0, 0], [0.000579, 0], [0.000579, 0.000579], [0, 0.000579], [0, 0]]] };
+const oldControlGeometry: ParcelGeoJson = { type: "Polygon", coordinates: [[[0.01, 0.01], [0.01035, 0.01], [0.01035, 0.01035], [0.01, 0.01035], [0.01, 0.01]]] };
+const correctedControlGeometry: ParcelGeoJson = { type: "Polygon", coordinates: [[[0.01, 0.01], [0.01064, 0.01], [0.01064, 0.01064], [0.01, 0.01064], [0.01, 0.01]]] };
 
 const seedGeometries = [
   syntheticGeometry("demo-family-001-geometry", "demo-family-001", "demo-family-001-parcel", "DEMO-128", "DEMO-456", "BHOOMICHECK-SYNTHETIC-GEO-001-V2", correctedHeroGeometry),
-  syntheticGeometry("demo-family-002-geometry", "demo-family-002", "demo-family-002-parcel", "DEMO-902", "DEMO-114", "BHOOMICHECK-SYNTHETIC-GEO-002", { type: "Polygon", coordinates: [[[0.01, 0.01], [0.01035, 0.01], [0.01035, 0.01035], [0.01, 0.01035], [0.01, 0.01]]] }),
+  syntheticGeometry("demo-family-002-geometry", "demo-family-002", "demo-family-002-parcel", "DEMO-902", "DEMO-114", "BHOOMICHECK-SYNTHETIC-GEO-002", correctedControlGeometry),
 ] as const;
 
 const fromRow = (row: GeometryRow): ParcelGeometry => {
@@ -30,6 +32,9 @@ export class ParcelGeometryService {
       const existing = await database.query<{ id: string }>({ sql: "SELECT id FROM parcel_geometries WHERE id = ?", params: [geometry.id] });
       if (geometry.id === "demo-family-001-geometry" && existing.length) {
         await database.execute({ sql: "UPDATE parcel_geometries SET geometry_json = ?, source_reference = ?, updated_at = ? WHERE id = ? AND case_id = ? AND parcel_id = ? AND source_type = ? AND geometry_json = ?", params: [JSON.stringify(correctedHeroGeometry), geometry.sourceReference, geometry.updatedAt, geometry.id, geometry.caseId, geometry.parcelId, "SYNTHETIC", JSON.stringify(oldHeroGeometry)] });
+      }
+      if (geometry.id === "demo-family-002-geometry" && existing.length) {
+        await database.execute({ sql: "UPDATE parcel_geometries SET geometry_json = ?, source_reference = ?, updated_at = ? WHERE id = ? AND case_id = ? AND parcel_id = ? AND source_type = ? AND geometry_json = ?", params: [JSON.stringify(correctedControlGeometry), geometry.sourceReference, geometry.updatedAt, geometry.id, geometry.caseId, geometry.parcelId, "SYNTHETIC", JSON.stringify(oldControlGeometry)] });
       }
       if (existing.length) continue;
       await database.execute({ sql: "INSERT INTO parcel_geometries (id,case_id,parcel_id,geometry_json,source_type,source_reference,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?)", params: [geometry.id, geometry.caseId, geometry.parcelId, JSON.stringify(geometry.geometry), geometry.sourceType, geometry.sourceReference, geometry.createdAt, geometry.updatedAt] });
