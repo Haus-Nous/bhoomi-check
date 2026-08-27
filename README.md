@@ -14,6 +14,7 @@ It is **not** a Government of Bihar product, does not connect to government syst
 4. Compare available records using deterministic rules.
 5. Review source-linked potential issues or insufficient evidence.
 6. Follow preparation guidance and create a clearly labelled local review-packet draft.
+7. Open **Parcel map** to view a clearly synthetic mapped boundary, calculated geometry area, and contextual document/survey areas.
 
 The hero case (`demo-family-001`) demonstrates an area mismatch and a family-context potential issue. Every verification result retains its source-document IDs and compared values.
 
@@ -22,6 +23,8 @@ The hero case (`demo-family-001`) demonstrates an area mismatch and a family-con
 AI extraction is optional and server-side. Set `AI_EXTRACTION_PROVIDER=gemini` (recommended for the demo) or `openai`; each proposes structured candidate facts only. Accepted facts require common schema validation, exact evidence spans, and deterministic semantic grounding. It does not decide a discrepancy, ownership, inheritance, or legal outcome.
 
 `VerificationService` makes deterministic area and family-context decisions. It returns `PASS`, `POTENTIAL_ISSUE`, or `INSUFFICIENT_EVIDENCE`; malformed or missing evidence is never turned into a discrepancy.
+
+Synthetic parcel GeoJSON is validated and its area is calculated deterministically. It is contextual only: it is not an official cadastral boundary and does not change verification outcomes. See [geospatial notes](docs/GEOSPATIAL.md).
 
 The citizen interface supports English and Hindi. Locale changes affect presentation only, never identifiers, evidence, citizen notes, or stored verification decisions.
 

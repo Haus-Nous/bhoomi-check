@@ -21,6 +21,7 @@ This repository is an independent hackathon prototype using synthetic/mock data 
 - Every verification result keeps its source document references and evidence text.
 - The review packet is a local MOCK preparation record. Marking it ready for review freezes local editing; it does not send, export, print, or submit anything.
 - Demo reset is limited to the two built-in seed IDs and is not a generic delete operation; it cannot target an arbitrary created case.
+- Parcel geometry is restricted to server-seeded fictional GeoJSON. It is labelled synthetic, is not an official cadastral boundary, and is never used to infer ownership, possession, encroachment, or a legal result.
 
 ## Extraction and AI guardrails
 
@@ -45,6 +46,7 @@ Future production work would need authenticated access, tenant isolation, manage
 | Extraction invents a fact | Candidate validation, source spans, semantic grounding, and accepted-fact persistence boundary |
 | A missing fact becomes a false discrepancy | Deterministic `INSUFFICIENT_EVIDENCE` outcome |
 | Government affiliation confusion | Independent brand, no government logos, no live integration |
+| Synthetic map is mistaken for a cadastral record | Persistent synthetic-boundary wording, no real geometry source, and no map-derived legal/discrepancy result |
 | Cross-user privacy expectation | Explicit local-prototype limitation; P1-09 authentication/session/tenancy is deferred |
 
 ## Release checklist

@@ -12,10 +12,13 @@ Local development stores synthetic case aggregates in Node SQLite at `data/bhoom
 | Verification snapshot | `verification_results` | Replaceable deterministic result set per case. Each item retains rule ID, outcome, source document IDs, compared values, evidence, and confidence. |
 | Review packet | `review_packets` | Local synthetic draft linked to one verification result. It retains source verification/document IDs, compared values, citizen notes/request, timestamps, and `DRAFT` or `READY_FOR_REVIEW` status. |
 | Timeline events | `timeline_events` | Persisted case activity plus packet events. It is citizen-facing history, not a technical audit log. |
+| Parcel geometry | `parcel_geometries` | Case- and parcel-scoped portable GeoJSON text, source/provenance reference, and timestamps. Seed rows are synthetic only; no PostGIS requirement exists. |
 
 `READY_FOR_REVIEW` means a local packet snapshot is frozen; it is never submitted, received, or approved by any government system. The packet service reuses the earliest packet for a case/result pair rather than generating duplicate drafts.
 
 The controlled demo reset deletes and recreates state only for the two server-defined seed IDs. It restores their synthetic aggregate, fixture documents, verification/packet/timeline state, and leaves every newly created synthetic case untouched.
+
+New synthetic cases have no automatically invented geometry. The parcel-intelligence read model therefore returns `geometry: null` and `calculatedArea: null` until an approved future geometry path exists.
 
 ## Derived read-model state
 

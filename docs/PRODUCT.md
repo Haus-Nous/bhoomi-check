@@ -18,6 +18,7 @@ It helps a citizen understand a **synthetic** land-survey case, organise supplie
 6. Read a single preparation-oriented next action.
 7. Prepare and locally save a MOCK review packet; a packet marked ready for review is read-only and is never submitted anywhere.
 8. Follow the timeline, which shows only events that have occurred for that persisted case.
+9. View optional synthetic parcel intelligence: a mapped boundary, calculated geometry area, and contextual existing record areas.
 
 The seeded hero case (`demo-family-001`) demonstrates an area mismatch and a family-context mismatch. The seeded control (`demo-family-002`) does not demonstrate either hero discrepancy. A newly created case begins without documents, extraction, verification, guidance, or packet data and shows explanatory empty states.
 
@@ -29,6 +30,8 @@ Verification is deterministic. The implemented rules compare:
 - the labelled family member under review with the labelled recorded holder when both source-backed values are present.
 
 If a required fact is absent, malformed, or not comparable, the outcome is `INSUFFICIENT_EVIDENCE`, not an invented discrepancy. A potential issue means the available synthetic records differ; it does not establish ownership, inheritance, title, fraud, record correctness, or legal eligibility.
+
+Geometry is a separate contextual layer. It is calculated from a synthetic map boundary and does not alter `AREA_CONSISTENCY`, determine ownership, or establish an official parcel boundary.
 
 ## AI and extraction boundary
 

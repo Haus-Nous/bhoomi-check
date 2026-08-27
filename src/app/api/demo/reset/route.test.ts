@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { POST } from "@/app/api/demo/reset/route";
 import { caseApplicationService } from "@/server/case-application-service";
 import { reviewPacketService } from "@/server/review-packet-service";
+import { parcelGeometryService } from "@/server/parcel-geometry-service";
 
 const request = (body: unknown) => new Request("http://localhost/api/demo/reset", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
 
@@ -14,6 +15,8 @@ describe("seed-only demo reset", () => {
     expect((await caseApplicationService.getCaseDetail(arbitrary.case.id))?.case.id).toBe(arbitrary.case.id);
     expect(await reviewPacketService.list("demo-family-001")).toEqual([]);
     expect((await caseApplicationService.getCaseDetail("demo-family-001"))?.case.nickname).toBe("Demo Case 001");
+    expect(await parcelGeometryService.getForParcel("demo-family-001", "demo-family-001-parcel", "DEMO-128", "DEMO-456")).toMatchObject({ id: "demo-family-001-geometry", provenance: "SYNTHETIC" });
+    expect(await parcelGeometryService.getForParcel(arbitrary.case.id, `${arbitrary.case.id}-parcel`, "DEMO-RESET-001")).toBeNull();
   });
 
   it("rejects arbitrary-case reset requests", async () => {

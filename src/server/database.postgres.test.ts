@@ -4,6 +4,7 @@ import { documentApplicationService } from "@/server/document-application-servic
 import { postgresSql, resetDatabaseForTests, setDatabaseForTests, SupabasePostgresAdapter, type PostgresClient, type PostgresQueryClient, type SqlValue } from "@/server/database";
 import { ReviewPacketService } from "@/server/review-packet-service";
 import { verificationService } from "@/server/verification-service";
+import { parcelGeometryService } from "@/server/parcel-geometry-service";
 
 type StoredRow = Record<string, SqlValue>;
 
@@ -23,6 +24,7 @@ class MockPostgresClient implements PostgresClient {
     if (selectCase) return [...this.table(selectCase[1]!).values()].filter((row) => row.case_id === params[0]).map((row) => ({ payload: row.payload }));
     const selectIdPayload = query.match(/^SELECT payload FROM (\w+) WHERE id = \$1$/);
     if (selectIdPayload) { const row = this.table(selectIdPayload[1]!).get(String(params[0])); return row ? [{ payload: row.payload }] : []; }
+    if (query.startsWith("SELECT id,case_id,parcel_id,geometry_json,source_type,source_reference,created_at,updated_at FROM parcel_geometries WHERE case_id = $1 AND parcel_id = $2")) { const row = [...this.table("parcel_geometries").values()].find((value) => value.case_id === params[0] && value.parcel_id === params[1]); return row ? [row] : []; }
     const insert = query.match(/^INSERT INTO (\w+) \(([^)]+)\)/);
     if (insert) { const fields = insert[2]!.split(","); const row = Object.fromEntries(fields.map((field, index) => [field, params[index] ?? null])); this.table(insert[1]!).set(String(row.id), row); return []; }
     const remove = query.match(/^DELETE FROM (\w+) WHERE (case_id|id) = \$1$/);
@@ -64,6 +66,7 @@ describe("SupabasePostgresAdapter", () => {
     const control = await cases.getCaseDetail("demo-family-002");
     expect(hero?.case.nickname).toBe("Demo Case 001");
     expect(control?.case.nickname).toBe("Demo Case 002");
+    expect(await parcelGeometryService.getForParcel("demo-family-001", "demo-family-001-parcel", "DEMO-128", "DEMO-456")).toMatchObject({ id: "demo-family-001-geometry", provenance: "SYNTHETIC" });
 
     await documentApplicationService.ensureSeedDocuments();
     const documents = await documentApplicationService.list("demo-family-001");

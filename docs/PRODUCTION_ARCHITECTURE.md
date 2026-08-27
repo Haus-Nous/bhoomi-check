@@ -10,6 +10,8 @@ flowchart TD
   APP --> EXT[Extraction service]
   EXT --> AI[Configured Gemini or OpenAI provider, optional]
   APP --> VER[Deterministic verification]
+  APP --> GEO[ParcelIntelligence / validated GeoJSON]
+  GEO --> MAP[MapLibre basemap visualization]
   APP --> GOV[GovernmentAdapter]
   GOV --> MOCK[MockGovernmentAdapter\nsynthetic data only]
 ```
@@ -17,6 +19,8 @@ flowchart TD
 The current prototype uses a server-side persistence adapter: local development uses SQLite, while the hosted Vercel demo uses Supabase Postgres through a server-only connection string. A packet is a local MOCK preparation record; `READY_FOR_REVIEW` freezes that record and never submits or exports it. Deterministic verification operates over stored synthetic records. Gemini (recommended for the demo) and OpenAI are optional server-side extraction providers using a shared versioned structured-output trust boundary. The only government boundary implemented is `MockGovernmentAdapter`; it is deterministic, performs no network calls, and labels every result as synthetic and non-official.
 
 `GovernmentAdapter` is an interface for future approved integrations. No `OfficialGovernmentAdapter`, portal integration, scraping, reverse engineering, OTP workflow, credential use, or submission behavior exists in this repository.
+
+The implemented geospatial layer stores synthetic GeoJSON without PostGIS and uses deterministic geodesic area calculation. Geometry is independent of basemap imagery. A future approved architecture may add `CadastralParcelProvider` behind `GovernmentAdapter`, plus separately bounded `BasemapProvider` and `ImageryProvider`; no real cadastral or satellite integration is implemented.
 
 ## Future production architecture — not implemented
 

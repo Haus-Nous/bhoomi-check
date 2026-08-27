@@ -8,6 +8,9 @@ flowchart LR
   CS --> API[Next.js API routes]
   API --> APP[Application / domain services]
   APP --> DB[(SQLite locally / Supabase Postgres when hosted)]
+  APP --> GEO[ParcelIntelligenceService]
+  GEO --> PG[Validated synthetic ParcelGeometry]
+  PG --> MAP[Client-side MapLibre / BasemapProvider]
   APP --> PREP[PreparedDocument]
   PREP --> EXT[Optional ExtractionService]
   EXT --> AI[Configured Gemini or OpenAI provider]
@@ -39,6 +42,10 @@ Extraction is optional and can suggest only grounded candidate facts. `Verificat
 ## Government boundary
 
 `GovernmentAdapter` is server-only. The sole implementation is `MockGovernmentAdapter`, which derives synthetic process context locally and makes no network request. No official adapter, scraping, credentials, OTP flow, or submission path exists.
+
+## Geospatial boundary
+
+`SyntheticParcelGeometryProvider` is represented by deterministic seed geometry persisted as `parcel_geometries`. `GeospatialService` validates GeoJSON and calculates area independently from imagery. A future authorized boundary is `GovernmentAdapter → CadastralParcelProvider → ParcelGeometry`; it is not implemented. `BasemapProvider` and future `ImageryProvider` affect visualization/context only and do not determine parcel geometry or discrepancies.
 
 ## Evaluation and observability
 

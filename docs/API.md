@@ -6,6 +6,7 @@ All implemented routes are local Next.js route handlers in the enforced `synthet
 | --- | --- | --- |
 | `POST` | `/api/cases` | Creates a synthetic case from clearly labelled synthetic location/nickname fields, a `DEMO-...` Khata, and optional `DEMO-...` Khesra. Returns `201`; invalid/non-synthetic input returns `400 INVALID_INPUT`. |
 | `GET` | `/api/cases/:caseId` | Returns the current `CaseDetail`, persisted documents/results/packets, derived guidance/timeline, and clearly labelled mock workflow context. Unknown cases return `404 CASE_NOT_FOUND`. |
+| `GET` | `/api/cases/:caseId/parcel-intelligence` | Returns the selected case’s parcel identity, validated synthetic GeoJSON when available, deterministic geometry area, and contextual historical/survey areas. It never returns another case’s geometry and does not decide a discrepancy. |
 | `GET` | `/api/cases/:caseId/documents` | Lists persisted documents scoped to the selected case. |
 | `GET` | `/api/cases/:caseId/documents/fixtures` | Lists approved bundled synthetic fixture choices for an existing case. |
 | `POST` | `/api/cases/:caseId/documents` | Strict `{ fixtureId }` attachment. First attachment returns `201`; repeat attachment reuses the case-scoped document and returns `200`. Invalid fixture input is `400`; unavailable fixture is `404`. |
