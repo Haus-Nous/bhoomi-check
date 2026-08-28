@@ -8,6 +8,12 @@ BhoomiCheck persists one clearly fictional GeoJSON `Polygon` for each seeded dem
 
 `ParcelIntelligenceService` assembles selected-case parcel identity, geometry, calculated area, and contextual historical/survey area values. It does not create a discrepancy status and does not modify `AREA_CONSISTENCY`.
 
+## Phase 17 three-source comparison
+
+Parcel Intelligence separately compares three synthetic area sources: a historical/document record, a survey/Parcha record, and a Turf calculation from persisted synthetic GeoJSON. Values are normalized to acres only for supported finite positive units (`acre`, `acres`, `hectare`, `hectares`, `square metre`, `square metres`, and `m²`). Missing, malformed, non-finite, zero, negative, or unsupported values remain unavailable; BhoomiCheck does not guess.
+
+For each of the three pairs, BhoomiCheck calculates `|A - B| / max(A, B) × 100`, making the percentage deterministic and independent of source order. The explicit `BHOOMICHECK_DEMO_AREA_V1` policy classifies ≤2% as `CONSISTENT`, >2% through ≤5% as `REVIEW`, and >5% as `POTENTIAL_ISSUE`; unavailable inputs are `INSUFFICIENT_EVIDENCE`. These are demo tolerances only, not legal, cadastral, statutory, or government tolerances. These derived comparison results remain separate from Phase 5 `VerificationResult` data and are never ownership conclusions.
+
 ## Persistence and isolation
 
 `parcel_geometries` stores portable text GeoJSON in both SQLite and Supabase Postgres. No PostGIS runtime is required. Geometry is resolved by both `case_id` and `parcel_id`; no client-supplied geometry ID is accepted. Seed creation and demo reset are idempotent, and new synthetic cases intentionally have no geometry.

@@ -66,6 +66,42 @@ const hi: Translation = {
 export const copy: Record<Locale, Translation> = { en, hi };
 export const t = (locale: Locale = "en") => copy[locale];
 
+export function localizedParcelComparisonPresentation(locale: Locale, summaryKey?: string) {
+  const hi = locale === "hi";
+  const summaries: Record<string, { title: string; detail: string }> = hi ? {
+    ALL_AREA_SOURCES_CLOSELY_ALIGNED: { title: "क्षेत्रफल स्रोत लगभग समान हैं", detail: "ऐतिहासिक रिकॉर्ड, सर्वे रिकॉर्ड और मानचित्रित कृत्रिम भू-खंड प्रदर्शन तुलना सीमा के भीतर हैं।" },
+    HISTORICAL_DIFFERS_SURVEY_AND_GEOMETRY_ALIGN: { title: "ऐतिहासिक क्षेत्रफल में संभावित अंतर", detail: "सर्वे मूल्य और मानचित्रित कृत्रिम सीमा लगभग समान हैं, जबकि ऐतिहासिक रिकॉर्ड में अधिक अंतर दिखता है।" },
+    AREA_COMPARISON_NEEDS_MORE_EVIDENCE: { title: "तुलना के लिए अधिक जानकारी चाहिए", detail: "उपलब्ध स्रोतों में से एक में क्षेत्रफल नहीं है। इसे अंतर न मानें।" },
+    AREA_COMPARISON_REVIEW_RECOMMENDED: { title: "क्षेत्रफल तुलना की समीक्षा करें", detail: "कुछ उपलब्ध क्षेत्रफल मूल्य प्रदर्शन तुलना सीमा से अलग हैं। स्रोत रिकॉर्ड साथ रखकर समीक्षा करें।" },
+  } : {
+    ALL_AREA_SOURCES_CLOSELY_ALIGNED: { title: "Area sources closely aligned", detail: "The historical record, survey record, and mapped synthetic parcel are within the demo comparison tolerance." },
+    HISTORICAL_DIFFERS_SURVEY_AND_GEOMETRY_ALIGN: { title: "Possible historical-area difference", detail: "The survey value and mapped synthetic boundary are closely aligned, while the historical record differs more substantially." },
+    AREA_COMPARISON_NEEDS_MORE_EVIDENCE: { title: "More information is needed for comparison", detail: "An available source does not contain an area value. This is not a discrepancy." },
+    AREA_COMPARISON_REVIEW_RECOMMENDED: { title: "Review the area comparison", detail: "Some available area values differ beyond the demo comparison tolerance. Review the source records together." },
+  };
+  return {
+    areaComparison: hi ? "क्षेत्रफल तुलना" : "Area comparison",
+    historical: hi ? "ऐतिहासिक रिकॉर्ड" : "Historical record",
+    survey: hi ? "सर्वे / पर्चा" : "Survey / Parcha",
+    geometry: hi ? "मानचित्रित सीमा" : "Mapped geometry",
+    source: hi ? "स्रोत" : "Source",
+    provenance: hi ? "उत्पत्ति" : "Provenance",
+    unavailable: hi ? "पर्याप्त जानकारी नहीं" : "Not enough information",
+    comparisons: hi ? "जोड़ी में तुलना" : "Pairwise comparisons",
+    difference: hi ? "अंतर" : "difference",
+    consistent: hi ? "लगभग समान" : "Closely aligned",
+    review: hi ? "समीक्षा आवश्यक" : "Needs review",
+    potential: hi ? "संभावित अंतर" : "Possible difference",
+    insufficient: hi ? "पर्याप्त जानकारी नहीं" : "Not enough information",
+    evidence: hi ? "स्रोत रिकॉर्ड देखें" : "Review source records",
+    sourcesAvailable: hi ? "3 क्षेत्रफल स्रोत उपलब्ध हैं" : "3 area sources available",
+    noMappedBoundary: hi ? "अभी कोई मानचित्रित भू-सीमा उपलब्ध नहीं है" : "No mapped parcel boundary yet",
+    how: hi ? "यह तुलना कैसे काम करती है" : "How this comparison works",
+    howDetail: hi ? "मूल्य एकड़ में बदले जाते हैं। प्रतिशत अंतर दो मूल्यों के अंतर को बड़े मूल्य से भाग देकर निकाला जाता है। GeoJSON/Turf से मानचित्रित क्षेत्रफल निकलता है। प्रदर्शन सीमाएँ AI, कानूनी, भू-अभिलेख, वैधानिक या सरकारी नियम नहीं हैं।" : "Values are normalized to acres. Percentage difference is the absolute difference divided by the larger value. Mapped area comes from GeoJSON/Turf. These demo tolerances are not AI, legal, cadastral, statutory, or government rules.",
+    summary: summaries[summaryKey ?? "AREA_COMPARISON_NEEDS_MORE_EVIDENCE"]!,
+  };
+}
+
 export function localizedVerificationPresentation(locale: Locale, ruleId: "AREA_CONSISTENCY" | "FAMILY_CONTEXT", outcome: "PASS" | "POTENTIAL_ISSUE" | "INSUFFICIENT_EVIDENCE") {
   const hi = locale === "hi";
   if (outcome === "INSUFFICIENT_EVIDENCE") return { title: hi ? "तुलना के लिए पर्याप्त जानकारी नहीं" : "Not enough comparable information", detail: hi ? "इस जाँच के लिए आवश्यक तुलनीय जानकारी उपलब्ध नहीं है। इसे असंगति न मानें; उपलब्ध रिकॉर्ड साथ रखें और आवश्यक जानकारी खोजें।" : "The comparable information needed for this check is not available. This is not a discrepancy; keep the available records together and identify what is missing." };

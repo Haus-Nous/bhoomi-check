@@ -57,3 +57,6 @@ Future production work would need authenticated access, tenant isolation, manage
 - [ ] No screen describes a potential issue as a legal conclusion.
 - [ ] New documentation distinguishes implemented prototype behaviour from future production work.
 - [ ] Any future upload or export feature is reviewed against these boundaries before implementation.
+# Synthetic parcel comparison safety
+
+Parcel Intelligence uses only synthetic documents and synthetic GeoJSON. Its area tolerances are illustrative demo policy, not government, legal, statutory, cadastral, or measurement standards. A mapped boundary is contextual and does not prove ownership, possession, encroachment, or record correctness.

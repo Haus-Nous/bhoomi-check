@@ -58,3 +58,6 @@ Implemented: Next.js UI/API, local SQLite persistence, bundled synthetic fixture
 Mocked: all government workflow context and every document/person/parcel fixture.
 
 Future, not implemented: authentication/session tenancy, managed relational storage, object storage, queues/workers, production observability, migrations/backups, live government integration, and government submission. A real-data deployment must add an authenticated principal followed by authorization/case-ownership validation before exposing persistence. The lack of that boundary means this prototype must not be deployed as a shared case system.
+# Parcel area comparison boundary
+
+`ParcelIntelligenceService` derives a typed three-source area model from existing synthetic documents, survey text, and persisted geometry. `ParcelAreaComparisonService` normalizes supported units, applies the symmetric demo policy, and returns pairwise comparisons plus a deterministic summary. No comparison state is persisted and no UI component decides a status. This path is AI-independent and intentionally separate from deterministic verification rules.

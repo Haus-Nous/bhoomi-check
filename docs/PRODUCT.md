@@ -57,3 +57,6 @@ A credible demo shows a persisted synthetic case, evidence-backed deterministic 
 ## Synthetic evaluation
 
 The repository includes a 12-case synthetic benchmark. Its reported values measure only those fixtures and deterministic checks. They are not claims about real land records, legal accuracy, model quality in the field, or production performance.
+# Parcel Intelligence
+
+The Parcel Intelligence view explains a synthetic document record, synthetic Survey/Parcha record, and mapped synthetic geometry together. It presents transparent, source-traceable deterministic comparisons and cautious wording. It does not decide which record is correct, establish ownership, or represent a government or cadastral determination.

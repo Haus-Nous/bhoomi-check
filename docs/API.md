@@ -23,3 +23,6 @@ All implemented routes are local Next.js route handlers in the enforced `synthet
 | `GET` | `/api/health` | Returns only safe synthetic-demo database availability status. |
 
 The client’s `CaseService` is the UI fetch boundary. Nested resources are validated against the selected synthetic case, but this is resource scoping—not user authorization. The current prototype does not implement a user/session authorization boundary; opaque case IDs and case-scoped nested queries are not a substitute for production tenancy.
+# Parcel intelligence comparison fields
+
+`GET /api/cases/:caseId/parcel-intelligence` retains `parcel`, `geometry`, `calculatedArea`, and `recordedAreas`, and also returns `areaSources`, `pairwiseComparisons`, `comparisonSummary`, and `comparisonPolicy`. Each source carries raw and normalized values plus source traceability. Pairwise results use the `BHOOMICHECK_DEMO_AREA_V1` demo-only policy and do not change verification results.
