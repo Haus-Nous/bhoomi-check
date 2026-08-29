@@ -47,6 +47,36 @@ Extraction is optional and can suggest only grounded candidate facts. `Verificat
 
 `SyntheticParcelGeometryProvider` is represented by deterministic seed geometry persisted as `parcel_geometries`. `GeospatialService` validates GeoJSON and calculates area independently from imagery. A future authorized boundary is `GovernmentAdapter → CadastralParcelProvider → ParcelGeometry`; it is not implemented. `BasemapProvider` and future `ImageryProvider` affect visualization/context only and do not determine parcel geometry or discrepancies.
 
+## Phase 18 synthetic official-record context
+
+```mermaid
+flowchart TD
+  LOOKUP[Official-record lookup UI] --> SERVICE[OfficialRecordService]
+  SERVICE --> PROVIDER[Provider role]
+  PROVIDER --> SYNTHETIC[SyntheticOfficialParcelRecordProvider]
+  SYNTHETIC --> RECORD[Normalized OfficialParcelRecord]
+  RECORD --> MATCH[Deterministic identity matching]
+  MATCH --> STORE[Idempotent case_official_records snapshot]
+  STORE --> READ[Case-scoped read route]
+  READ --> DASH[Dashboard context]
+  READ --> DOCS[Documents imported-record section]
+  READ --> PARCEL[Parcel Intelligence context]
+```
+
+`SyntheticOfficialParcelRecordProvider` is the only implemented provider. It returns fixed, fictional `OfficialParcelRecord` fixtures and makes no network request. The provider role is deliberately narrow—search by district/circle/mauza plus Khata or Khesra, then retrieve a selected fixture by ID—so a future lawful provider can be considered without coupling UI components to fixture data.
+
+The service deterministically compares the selected record with the selected case parcel and location. A mismatch is rejected; an exact or partial match is persisted as an `ImportedOfficialRecord` snapshot. The database uniqueness constraint on `(case_id, official_record_id)` makes import idempotent. The read endpoint verifies the case exists and exposes only records linked to that case.
+
+### Deliberate separation of record concepts
+
+1. **Ordinary case documents** live in `documents`. They are bundled synthetic citizen-side fixtures, can be prepared/extracted, and feed the existing verification/document experiences.
+2. **Imported synthetic official-style records** live separately in `case_official_records`. They are immutable context snapshots with provider, provenance, source-reference, authority, and identity-match data. They are not uploaded files and are never appended to `CaseDetail.documents`.
+3. **Phase 17 parcel-area sources** remain exactly three deterministic sources: a historical/document record, a survey/Parcha record, and calculated mapped geometry.
+
+Imported official-style records are context only: they are not a fourth area source and cannot affect `areaSources`, `pairwiseComparisons`, `comparisonSummary`, or verification truth. Parcel Intelligence may display the imported-record context, but its deterministic comparison service does not read it.
+
+Phase 18 requires neither Gemini nor OpenAI. AI does not perform identity matching; that comparison and every import decision are deterministic server code.
+
 ## Evaluation and observability
 
 The 12-case evaluation constructs synthetic document inputs and invokes the production `VerificationService`. Ground truth is declared independently; calculated metrics include correct/incorrect outcomes, FP/FN, and insufficient-evidence classification counts. Metrics are process-local and privacy-minimized; they are not production monitoring.

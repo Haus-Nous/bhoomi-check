@@ -1,7 +1,7 @@
 export type Locale = "en" | "hi";
 
 type Translation = {
-  nav: Record<"home" | "dashboard" | "documents" | "family" | "verification" | "survey" | "parcel" | "action" | "timeline", string>;
+  nav: Record<"home" | "dashboard" | "documents" | "family" | "verification" | "survey" | "parcel" | "official" | "action" | "timeline", string>;
   notice: string;
   footer: string;
   cta: Record<"check" | "how" | "review" | "continue" | "back" | "close" | "save" | "preparePacket" | "readyForReview" | "exploreDemo" | "resetDemo" | "viewControl", string>;
@@ -22,7 +22,7 @@ type Translation = {
 };
 
 const en: Translation = {
-  nav: { home: "Home", dashboard: "My case", documents: "Documents", family: "Family", verification: "Check records", survey: "Survey record", parcel: "Parcel map", action: "Next step", timeline: "Timeline" },
+  nav: { home: "Home", dashboard: "My case", documents: "Documents", family: "Family", verification: "Check records", survey: "Survey record", parcel: "Parcel map", official: "Record lookup", action: "Next step", timeline: "Timeline" },
   notice: "Independent prototype · Synthetic demo data only · Not legal advice or a government portal",
   footer: "© 2026 BhoomiCheck · Independent prototype · No real government records are used.",
   cta: { check: "Check My Land Record", how: "See How It Works", review: "Review survey record", continue: "Continue", back: "Back to case summary", close: "Close", save: "Save draft", preparePacket: "Prepare review packet", readyForReview: "Mark ready for review", exploreDemo: "Explore demo case", resetDemo: "Reset demo case", viewControl: "View control case" },
@@ -43,7 +43,7 @@ const en: Translation = {
 };
 
 const hi: Translation = {
-  nav: { home: "होम", dashboard: "मेरा केस", documents: "दस्तावेज़", family: "परिवार", verification: "रिकॉर्ड जाँचें", survey: "सर्वे रिकॉर्ड", parcel: "भू-खंड मानचित्र", action: "अगला कदम", timeline: "समयरेखा" },
+  nav: { home: "होम", dashboard: "मेरा केस", documents: "दस्तावेज़", family: "परिवार", verification: "रिकॉर्ड जाँचें", survey: "सर्वे रिकॉर्ड", parcel: "भू-खंड मानचित्र", official: "आधिकारिक रिकॉर्ड खोज", action: "अगला कदम", timeline: "समयरेखा" },
   notice: "स्वतंत्र प्रोटोटाइप · केवल सिंथेटिक डेमो डेटा · कानूनी सलाह या सरकारी पोर्टल नहीं",
   footer: "© 2026 BhoomiCheck · स्वतंत्र प्रोटोटाइप · किसी वास्तविक सरकारी रिकॉर्ड का उपयोग नहीं किया जाता।",
   cta: { check: "भूमि रिकॉर्ड जाँचें", how: "कैसे काम करता है", review: "सर्वे रिकॉर्ड देखें", continue: "आगे बढ़ें", back: "केस सारांश पर लौटें", close: "बंद करें", save: "ड्राफ्ट सहेजें", preparePacket: "समीक्षा पैकेट तैयार करें", readyForReview: "समीक्षा के लिए तैयार चिह्नित करें", exploreDemo: "डेमो केस देखें", resetDemo: "डेमो केस रीसेट करें", viewControl: "कंट्रोल केस देखें" },
@@ -65,6 +65,49 @@ const hi: Translation = {
 
 export const copy: Record<Locale, Translation> = { en, hi };
 export const t = (locale: Locale = "en") => copy[locale];
+
+export function localizedOfficialRecordPresentation(locale: Locale) { const hi = locale === "hi"; return { title: hi ? "आधिकारिक रिकॉर्ड खोज" : "Official record lookup", subtitle: hi ? "सभी परिणाम कृत्रिम हैं; कोई लाइव सरकारी रिकॉर्ड नहीं खोजा जाता।" : "All results are synthetic; no live government records are searched.", search: hi ? "कृत्रिम रिकॉर्ड खोजें" : "Search synthetic records", synthetic: hi ? "कृत्रिम आधिकारिक-शैली रिकॉर्ड" : "Synthetic official-style record", loading: hi ? "खोज रहे हैं…" : "Searching…", noMatch: hi ? "इन पहचानों से कोई कृत्रिम रिकॉर्ड मेल नहीं खाता।" : "No synthetic fixture matches these identifiers.", multiple: hi ? "एक से अधिक कृत्रिम रिकॉर्ड मिले।" : "Multiple synthetic records found.", import: hi ? "मामले में जोड़ें" : "Import into case", added: hi ? "रिकॉर्ड मामले में जोड़ा गया।" : "Record added to case.", linked: hi ? "रिकॉर्ड पहले से इस मामले से जुड़ा है।" : "Record already linked to this case.", mismatch: hi ? "यह रिकॉर्ड इस केस की पहचान से मेल नहीं खाता।" : "This record does not match this case identity.", safety: hi ? "यह सरकारी रिकॉर्ड नहीं बदलता, कुछ जमा नहीं करता, स्वामित्व नहीं बदलता और मौजूदा दस्तावेज़ नहीं बदलता।" : "It does not modify government records, submit anything, change ownership, or replace existing documents.", context: hi ? "आधिकारिक-शैली रिकॉर्ड संदर्भ" : "Official-style record context", none: hi ? "कोई कृत्रिम आधिकारिक-शैली रिकॉर्ड लिंक नहीं है।" : "No synthetic official-style record has been linked.", area: hi ? "दर्ज क्षेत्रफल" : "Recorded area", provider: hi ? "प्रदाता" : "Provider", provenance: hi ? "उत्पत्ति" : "Provenance", lookup: hi ? "रिकॉर्ड खोजें" : "Search records" }; }
+
+export function localizedOfficialRecordInspectionPresentation(locale: Locale) {
+  const hi = locale === "hi";
+  return {
+    searchResults: hi ? "कृत्रिम खोज परिणाम" : "Synthetic search results",
+    district: hi ? "जिला" : "District",
+    circle: hi ? "अंचल" : "Circle",
+    mauza: hi ? "मौजा" : "Mauza",
+    khata: "Khata",
+    khesra: "Khesra",
+    holders: hi ? "दर्ज धारक" : "Holder names",
+    recordType: hi ? "रिकॉर्ड प्रकार" : "Record type",
+    surveyStage: hi ? "सर्वे चरण" : "Survey stage",
+    remarks: hi ? "टिप्पणियां" : "Remarks",
+    source: hi ? "स्रोत संदर्भ" : "Source reference",
+    identity: hi ? "पहचान मिलान" : "Identity match",
+    authority: hi ? "प्राधिकार स्थिति" : "Authority status",
+    notAuthoritative: hi ? "यह कृत्रिम रिकॉर्ड आधिकारिक नहीं है।" : "This synthetic record is not authoritative.",
+    exact: hi ? "केस की पहचान से पूरा मिलान" : "Exact match with this case identity",
+    partial: hi ? "केस की पहचान से आंशिक मिलान" : "Partial match with this case identity",
+    validation: hi ? "जिला, अंचल, मौजा और Khata या Khesra भरें।" : "Provide district, circle, mauza, and either Khata or Khesra.",
+    serverError: hi ? "कृत्रिम रिकॉर्ड अभी नहीं खोजे जा सके। कृपया फिर कोशिश करें।" : "Synthetic records could not be searched right now. Please try again.",
+    importError: hi ? "कृत्रिम रिकॉर्ड मामले में नहीं जोड़ा जा सका। कृपया फिर कोशिश करें।" : "The synthetic record could not be added to the case. Please try again.",
+    adding: hi ? "मामले में जोड़ा जा रहा है…" : "Adding to case…",
+    notLive: hi ? "यह लाइव सरकारी सिस्टम से प्राप्त नहीं किया गया है।" : "Not retrieved from a live government system.",
+    importSafety: hi ? "इसे मामले में जोड़ने से सरकारी रिकॉर्ड नहीं बदलते, किसी प्राधिकरण को कुछ जमा नहीं होता, स्वामित्व नहीं बदलता और मौजूदा दस्तावेज़ नहीं बदलते।" : "Adding this record does not modify government records, submit anything to authorities, change ownership, or replace existing documents.",
+  };
+}
+
+export function localizedOfficialRecordDocumentsPresentation(locale: Locale) {
+  const hi = locale === "hi";
+  return {
+    title: hi ? "आयात किए गए रिकॉर्ड" : "Imported records",
+    loading: hi ? "आयात किए गए रिकॉर्ड लोड हो रहे हैं…" : "Loading imported records…",
+    unavailable: hi ? "आयात किए गए रिकॉर्ड अभी नहीं दिखाए जा सके। कृपया फिर कोशिश करें।" : "Imported records could not be shown right now. Please try again.",
+    view: hi ? "रिकॉर्ड देखें" : "View record",
+    source: hi ? "स्रोत" : "Source",
+    identity: hi ? "पहचान मिलान" : "Identity match",
+    notAuthoritative: hi ? "यह कृत्रिम रिकॉर्ड आधिकारिक नहीं है।" : "This synthetic record is not authoritative.",
+  };
+}
 
 export function localizedParcelComparisonPresentation(locale: Locale, summaryKey?: string) {
   const hi = locale === "hi";

@@ -19,6 +19,8 @@ It helps a citizen understand a **synthetic** land-survey case, organise supplie
 7. Prepare and locally save a MOCK review packet; a packet marked ready for review is read-only and is never submitted anywhere.
 8. Follow the timeline, which shows only events that have occurred for that persisted case.
 9. View optional synthetic parcel intelligence: a mapped boundary, calculated geometry area, and contextual existing record areas.
+10. Look up synthetic official-style fixtures by case identifiers, inspect a selected result, verify its deterministic identity context, and link it to the BhoomiCheck case.
+11. Review a linked official-style record as separate context on the Dashboard, Documents, and Parcel Intelligence screens.
 
 The seeded hero case (`demo-family-001`) demonstrates an area mismatch and a family-context mismatch. The seeded control (`demo-family-002`) does not demonstrate either hero discrepancy. A newly created case begins without documents, extraction, verification, guidance, or packet data and shows explanatory empty states.
 
@@ -32,6 +34,20 @@ Verification is deterministic. The implemented rules compare:
 If a required fact is absent, malformed, or not comparable, the outcome is `INSUFFICIENT_EVIDENCE`, not an invented discrepancy. A potential issue means the available synthetic records differ; it does not establish ownership, inheritance, title, fraud, record correctness, or legal eligibility.
 
 Geometry is a separate contextual layer. It is calculated from a synthetic map boundary and does not alter `AREA_CONSISTENCY`, determine ownership, or establish an official parcel boundary.
+
+## Synthetic official-record context
+
+The Phase 18 journey is:
+
+```text
+Case → official-record lookup → search synthetic official-style fixtures
+→ inspect result → verify deterministic identity context
+→ import into BhoomiCheck case → view case context
+```
+
+This demonstrates how BhoomiCheck could eventually consume a lawful official-record provider without connecting the hackathon prototype to government infrastructure today. Every current result is a deterministic synthetic fixture, is not legal evidence, is not authoritative, and cannot be submitted anywhere or change ownership.
+
+An imported synthetic official-style record is a case-context artifact rather than a citizen-uploaded document. It does not replace existing documents, feed extraction, or change verification truth. Phase 17 also remains exactly a three-source comparison—historical/document record, Survey/Parcha record, and mapped geometry. The imported record is context only, not a fourth source.
 
 ## AI and extraction boundary
 

@@ -23,6 +23,17 @@ This repository is an independent hackathon prototype using synthetic/mock data 
 - Demo reset is limited to the two built-in seed IDs and is not a generic delete operation; it cannot target an arbitrary created case.
 - Parcel geometry is restricted to server-seeded fictional GeoJSON. It is labelled synthetic, is not an official cadastral boundary, and is never used to infer ownership, possession, encroachment, or a legal result.
 
+## Phase 18 official-record boundary
+
+- Official-record lookup uses only server-bundled synthetic fixtures. It does not scrape, call, or search a live Bihar government system or any real citizen record source.
+- Every fixture is explicitly non-authoritative: its metadata is `authoritative=false` and its provenance is `SYNTHETIC_OFFICIAL_FIXTURE`.
+- Importing a fixture is only a local, case-scoped context link. It does not modify government records, submit anything to an authority, change ownership, or create legal evidence.
+- Imported official-style records are stored separately from ordinary citizen-side documents. They never overwrite, replace, or silently append to the `documents` collection.
+- The import does not alter deterministic verification truth. It also cannot alter Phase 17 area sources, pairwise comparisons, or comparison summary; Phase 17 stays limited to historical/document, Survey/Parcha, and mapped-geometry sources.
+- Identity matching is deterministic server code. Gemini and OpenAI are not required and do not decide whether a match, mismatch, or import exists.
+
+The safe no-match message, **“No synthetic fixture matches these identifiers.”**, means only that the bundled demo fixtures contain no match. It never means that no real land record exists.
+
 ## Extraction and AI guardrails
 
 Gemini or OpenAI extraction is optional, server-side, and only applicable to synthetic fixture text. The selected provider may suggest structured candidate fields, but accepted fields require schema validation, evidence-span validation, and semantic grounding against labelled source text. The deterministic verification service—not an LLM—decides whether a comparable discrepancy exists.

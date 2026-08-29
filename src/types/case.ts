@@ -43,3 +43,8 @@ export type ReviewPacket = { id: string; caseId: string; relatedVerificationResu
 export type TimelineEvent = { id: string; dateLabel: string; title: string; detail: string; status: TimelineStatus };
 export type GovernmentProcessContext = { source: "MOCK_GOVERNMENT_ADAPTER"; synthetic: true; status: { stageId: string; stage: string }; availableActions: string[]; disclaimer: string };
 export type CaseDetail = { case: LandCase; family: { members: FamilyMember[]; relationships: FamilyRelationship[] }; landParcels: LandParcel[]; documents: DocumentItem[]; surveyRecord?: SurveyRecord; verification: VerificationItem[]; guidance?: GuidanceItem[]; reviewPackets?: ReviewPacket[]; governmentProcess?: GovernmentProcessContext; nextAction?: NextAction; timeline: TimelineEvent[] };
+
+export type OfficialParcelSearchQuery = { district: string; circle: string; mauza: string; khataNumber?: string; khesraNumber?: string };
+export type OfficialIdentityMatch = "EXACT_MATCH" | "PARTIAL_MATCH" | "MISMATCH";
+export type OfficialParcelRecord = { id: string; sourceProvider: "synthetic"; provenance: "SYNTHETIC_OFFICIAL_FIXTURE"; sourceReference: string; parcelIdentity: Required<OfficialParcelSearchQuery>; recordData: { recordedArea: number; recordedAreaUnit: "acre"; normalizedAreaAcres: number; holderNames: string[]; recordType: string; surveyStage: string; remarks: string }; sourceMetadata: { retrievedAt: string; displayName: string; syntheticNotice: string; authoritative: false } };
+export type ImportedOfficialRecord = { id: string; caseId: string; officialRecordId: string; provider: "synthetic"; provenance: "SYNTHETIC_OFFICIAL_FIXTURE"; sourceReference: string; identityMatch: OfficialIdentityMatch; record: OfficialParcelRecord; importedAt: string };

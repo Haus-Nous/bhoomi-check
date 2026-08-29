@@ -84,3 +84,7 @@ npm run build
 # Phase 17: synthetic parcel intelligence
 
 The Parcel Intelligence page now makes the synthetic document, survey/Parcha, and mapped-geometry area story transparent. It uses deterministic acreage normalization and symmetric pairwise comparisons with clearly labelled demo-only tolerances; it does not use AI or make legal conclusions.
+
+## Synthetic official-record lookup
+
+Phase 18 demonstrates a future lawful integration through deterministic synthetic fixtures only. A citizen can search, inspect, identity-check, and idempotently link a synthetic official-style record to a case; Dashboard, Documents, and Parcel Intelligence show it as context. Every linked record preserves `SYNTHETIC_OFFICIAL_FIXTURE` provenance and `authoritative=false`. It never queries government systems, becomes an ordinary document, changes verification, or becomes a fourth Phase 17 area source.
