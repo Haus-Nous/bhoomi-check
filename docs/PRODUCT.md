@@ -70,6 +70,10 @@ English and Hindi are presentation locales from one controlled copy structure. S
 
 A credible demo shows a persisted synthetic case, evidence-backed deterministic findings, clear Hindi/English explanations, one next preparation action, and a locally persisted MOCK packet. All consequential screens retain the independent-prototype, synthetic-data, and non-legal boundary.
 
+## Earth observation context
+
+The Parcel Intelligence route can lead to a dedicated two-date synthetic context view. It uses plain language such as possible vegetation or built-up context change, but repeatedly states that imagery is neither cadastral nor legal evidence. It must never describe an indicator as encroachment, ownership, boundary movement, construction legality, or a government-confirmed result.
+
 ## Synthetic evaluation
 
 The repository includes a 12-case synthetic benchmark. Its reported values measure only those fixtures and deterministic checks. They are not claims about real land records, legal accuracy, model quality in the field, or production performance.

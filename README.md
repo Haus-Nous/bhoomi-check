@@ -81,6 +81,10 @@ npm run build
 ```
 
 `npm run eval` runs a 12-case, 24-rule-check synthetic benchmark against the production verification service. Its current result is 24/24 correct for that fixture set only; it is not a real-world, legal, or live-model accuracy claim.
+
+## Synthetic earth-observation context
+
+Parcel Intelligence links to a two-date synthetic contextual-imagery view for the hero and control cases. The display is local and deterministic, requires no AI key or imagery provider credential, and is explicitly not cadastral or legal evidence. It never affects the three Phase 17 area sources, verification, or imported official-style records. See [Earth observation context](docs/EARTH_OBSERVATION.md).
 # Phase 17: synthetic parcel intelligence
 
 The Parcel Intelligence page now makes the synthetic document, survey/Parcha, and mapped-geometry area story transparent. It uses deterministic acreage normalization and symmetric pairwise comparisons with clearly labelled demo-only tolerances; it does not use AI or make legal conclusions.

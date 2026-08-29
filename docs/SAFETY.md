@@ -71,3 +71,7 @@ Future production work would need authenticated access, tenant isolation, manage
 # Synthetic parcel comparison safety
 
 Parcel Intelligence uses only synthetic documents and synthetic GeoJSON. Its area tolerances are illustrative demo policy, not government, legal, statutory, cadastral, or measurement standards. A mapped boundary is contextual and does not prove ownership, possession, encroachment, or record correctness.
+
+## Synthetic imagery context
+
+Earth-observation visuals are locally generated synthetic context scenes, not satellite, government, cadastral, or Google imagery. Their deterministic indicators are presentation context only. They do not establish ownership, possession, encroachment, construction legality, boundary correctness, mutation, or official survey status; they do not affect verification or area comparison. No external imagery API, provider token, scraping, or machine analysis of third-party map tiles is used.

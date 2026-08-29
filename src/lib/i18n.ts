@@ -109,6 +109,52 @@ export function localizedOfficialRecordDocumentsPresentation(locale: Locale) {
   };
 }
 
+export function localizedEarthObservationPresentation(locale: Locale) {
+  const hi = locale === "hi";
+  return {
+    header: hi ? "पृथ्वी अवलोकन संदर्भ" : "Earth observation context",
+    subtitle: hi ? "दो सिंथेटिक संदर्भ छवियों की सावधानीपूर्ण, गैर-कानूनी तुलना।" : "A careful, non-legal comparison of two synthetic context images.",
+    teaserTitle: hi ? "पृथ्वी अवलोकन संदर्भ" : "Earth observation context",
+    teaserDetail: hi ? "दो सिंथेटिक छवियों में संदर्भ परिवर्तन की तुलना करें।" : "Compare context change across two synthetic images.",
+    view: hi ? "परिवर्तन संदर्भ देखें" : "View change context",
+    synthetic: hi ? "सिंथेटिक संदर्भ छवियां" : "Synthetic contextual imagery",
+    earlier: hi ? "पहले का अवलोकन" : "Earlier observation",
+    later: hi ? "बाद का अवलोकन" : "Later observation",
+    provider: hi ? "प्रदाता" : "Provider",
+    provenance: hi ? "उत्पत्ति" : "Provenance",
+    quality: hi ? "संदर्भ गुणवत्ता" : "Context quality",
+    source: hi ? "स्रोत संदर्भ" : "Source reference",
+    indicators: hi ? "संदर्भ संकेतक" : "Context indicators",
+    earlierValue: hi ? "पहले" : "Earlier",
+    laterValue: hi ? "बाद में" : "Later",
+    change: hi ? "परिवर्तन" : "Change",
+    vegetation: hi ? "वनस्पति संदर्भ" : "Vegetation context",
+    builtUp: hi ? "निर्मित-सतह संदर्भ" : "Built-up context",
+    surface: hi ? "सतह परिवर्तन" : "Surface change",
+    water: hi ? "जल संदर्भ" : "Water context",
+    stable: hi ? "स्थिर" : "Stable",
+    small: hi ? "छोटा परिवर्तन" : "Small change",
+    noticeable: hi ? "ध्यान देने योग्य परिवर्तन" : "Noticeable change",
+    insufficient: hi ? "पर्याप्त साक्ष्य नहीं" : "Insufficient evidence",
+    overall: hi ? "समग्र संदर्भ सारांश" : "Overall context summary",
+    heroSummary: hi ? "दो सिंथेटिक अवलोकन तिथियों के बीच, भू-खंड संदर्भ में वनस्पति की उल्लेखनीय कमी और निर्मित सतह में वृद्धि दिखाई देती है।" : "Between the two synthetic observation dates, the parcel context shows a noticeable reduction in vegetation and an increase in built-up surface.",
+    controlSummary: hi ? "दो सिंथेटिक अवलोकन तिथियों में कोई बड़ा संदर्भ परिवर्तन नहीं दिखता।" : "The two synthetic observation dates show no major contextual change.",
+    insufficientSummary: hi ? "इस केस के लिए दो तुलनीय सिंथेटिक संदर्भ छवियां उपलब्ध नहीं हैं। BhoomiCheck कोई निष्कर्ष नहीं बनाता।" : "Two comparable synthetic context images are not available for this case. BhoomiCheck does not infer a change.",
+    explanationVegetation: hi ? "वनस्पति संदर्भ में यह परिवर्तन केवल सिंथेटिक प्रदर्शन संकेतक है।" : "This vegetation-context change is a synthetic demonstration indicator only.",
+    explanationBuiltUp: hi ? "निर्मित-सतह संदर्भ में यह परिवर्तन केवल सिंथेटिक प्रदर्शन संकेतक है।" : "This built-up-context change is a synthetic demonstration indicator only.",
+    explanationInsufficient: hi ? "तुलना के लिए आवश्यक सिंथेटिक संदर्भ जानकारी उपलब्ध नहीं है।" : "The synthetic context information needed for comparison is unavailable.",
+    safetyTitle: hi ? "न भू-अभिलेखीय, न कानूनी साक्ष्य" : "Not cadastral or legal evidence",
+    safetyDetail: hi ? "ये सिंथेटिक संदर्भ छवियां हैं। दिखाए गए परिवर्तन स्वामित्व, कब्जे, अतिक्रमण, निर्माण की वैधता या भू-सीमा की शुद्धता स्थापित नहीं करते।" : "These are synthetic contextual images. Changes shown here do not establish ownership, possession, encroachment, construction legality, or boundary correctness.",
+    traceability: hi ? "ट्रेसबिलिटी और सीमाएं" : "Traceability and limits",
+    traceabilityDetail: hi ? "प्रदाता स्थानीय सिंथेटिक फिक्स्चर है। यह डेमो नीति केवल संदर्भ संकेतकों का वर्गीकरण करती है और क्षेत्रफल तुलना, आधिकारिक रिकॉर्ड या सत्यापन परिणामों को नहीं बदलती।" : "The provider is a local synthetic fixture. This demo policy classifies context indicators only; it does not change area comparison, official records, or verification results.",
+    unavailableTitle: hi ? "सिंथेटिक संदर्भ छवियां उपलब्ध नहीं" : "Synthetic context imagery unavailable",
+    unavailableDetail: hi ? "यह नया सिंथेटिक केस है और इसके लिए कोई दो-तारीख संदर्भ फिक्स्चर नहीं बनाया गया है।" : "This is a new synthetic case and no two-date context fixture has been created for it.",
+    back: hi ? "भू-खंड जानकारी पर लौटें" : "Back to Parcel Intelligence",
+    loading: hi ? "सिंथेटिक संदर्भ छवियां लोड हो रही हैं…" : "Loading synthetic contextual imagery…",
+    error: hi ? "सिंथेटिक संदर्भ छवियां अभी नहीं दिखाई जा सकीं। कृपया फिर कोशिश करें।" : "Synthetic contextual imagery could not be shown right now. Please try again.",
+  };
+}
+
 export function localizedParcelComparisonPresentation(locale: Locale, summaryKey?: string) {
   const hi = locale === "hi";
   const summaries: Record<string, { title: string; detail: string }> = hi ? {

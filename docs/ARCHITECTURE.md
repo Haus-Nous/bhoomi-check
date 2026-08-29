@@ -75,6 +75,10 @@ The service deterministically compares the selected record with the selected cas
 
 Imported official-style records are context only: they are not a fourth area source and cannot affect `areaSources`, `pairwiseComparisons`, `comparisonSummary`, or verification truth. Parcel Intelligence may display the imported-record context, but its deterministic comparison service does not read it.
 
+## Synthetic earth-observation context
+
+`EarthObservationService` has an `ImageryProvider` boundary with the in-repository `SyntheticImageryProvider` implementation. It emits a read-only `EarthObservationInsight` for a case-scoped route and UI. The deterministic context policy operates only on fixture metrics; no database table, AI call, external imagery request, or legal inference is involved. This is an independent contextual layer: it does not read or modify Phase 17 area sources, Phase 18 imports, or `VerificationService` results.
+
 Phase 18 requires neither Gemini nor OpenAI. AI does not perform identity matching; that comparison and every import decision are deterministic server code.
 
 ## Evaluation and observability

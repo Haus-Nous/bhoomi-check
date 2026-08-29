@@ -3,6 +3,7 @@ import "./globals.css";
 import "./verification.css";
 import "./guidance.css";
 import "./locale.css";
+import "./earth-observation.css";
 import { CaseProvider } from "@/components/case-context";
 import { LocaleProvider } from "@/components/locale-context";
 import { Notice, SiteFooter, SiteHeader } from "@/components/shell";

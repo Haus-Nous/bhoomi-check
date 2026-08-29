@@ -61,3 +61,7 @@ New synthetic cases have no automatically invented geometry. The parcel-intellig
 `survey-workflow.ts` and `MockGovernmentAdapter` are server-side configuration/boundaries, not government data. `MockGovernmentAdapter` derives clearly synthetic workflow context and makes no network call.
 
 The database adapter selects local SQLite without `DATABASE_URL` and server-side Supabase Postgres when it is configured. Browser components never receive a database credential. This synthetic-demo prototype has no user/session tenancy, production migrations, managed backups, object storage, background workers, or production audit logging. Only synthetic data belongs in it.
+
+## Earth-observation read model
+
+Phase 19 adds typed `ImagerySnapshot`, `EarthObservationIndicator`, and `EarthObservationInsight` models. They are immutable provider fixture/read-model data, not database entities: no new table is required. Each snapshot carries provider, synthetic source type, local `synthetic://` asset reference, provenance, quality, `synthetic: true`, and `authoritative: false`. Indicators carry earlier/later values, a percentage-point delta, a deterministic classification, and policy provenance. This context model is intentionally absent from `ParcelIntelligence.areaSources`, pairwise area comparisons, verification results, and `CaseDetail.documents`.

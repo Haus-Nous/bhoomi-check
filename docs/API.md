@@ -122,6 +122,12 @@ Before import, data is an empty array. An unknown case returns 404:
 ~~~
 
 The route never exposes another case’s links and never changes ordinary documents, verification results, or Phase 17 area-comparison data.
+
+## `GET /api/cases/:caseId/earth-observation`
+
+Returns read-only deterministic synthetic contextual imagery for a known case. The response contains the parcel identity, zero or two `ImagerySnapshot` fixtures, deterministic context indicators, an overall classification, policy identifier, provenance, and explicit `synthetic=true`, `authoritative=false`, `legalEvidence=false` safety metadata. It performs no network, AI, or government-provider request.
+
+`demo-family-001` returns two snapshots and `NOTICEABLE_CHANGE`; `demo-family-002` returns a stable pair; a known case without a fixture returns 200 with `INSUFFICIENT_EVIDENCE`; an unknown case returns 404. This API is not an area source and cannot change Phase 17 comparison or verification output.
 # Parcel intelligence comparison fields
 
 `GET /api/cases/:caseId/parcel-intelligence` retains `parcel`, `geometry`, `calculatedArea`, and `recordedAreas`, and also returns `areaSources`, `pairwiseComparisons`, `comparisonSummary`, and `comparisonPolicy`. Each source carries raw and normalized values plus source traceability. Pairwise results use the `BHOOMICHECK_DEMO_AREA_V1` demo-only policy and do not change verification results.
