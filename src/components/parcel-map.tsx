@@ -15,6 +15,12 @@ export const parcelBounds = (geometry: ParcelGeoJson): [[number, number], [numbe
   return [[Math.min(...longitudes), Math.min(...latitudes)], [Math.max(...longitudes), Math.max(...latitudes)]];
 };
 
+/** Presentation-only camera settings. They never affect stored geometry or area calculations. */
+export const parcelCameraOptions = (viewportWidth: number) => ({
+  padding: viewportWidth <= 760 ? 36 : 72,
+  maxZoom: 20,
+});
+
 export const createPublicBasemapStyle = (geometry: ParcelGeoJson, mapColor: string): StyleSpecification => ({
   version: 8,
   sources: {
@@ -64,9 +70,9 @@ export function ParcelMap({ geometry, label, loadingLabel, unavailableLabel, bac
         const readyMap = () => {
           if (disposed || readyHandled) return;
           readyHandled = true;
-          const mapWithSource = instance as unknown as { getSource: (id: string) => { setData: (data: unknown) => void } | undefined; fitBounds: (bounds: [[number, number], [number, number]], options: { padding: number; maxZoom: number }) => void };
+          const mapWithSource = instance as unknown as { getSource: (id: string) => { setData: (data: unknown) => void } | undefined };
           mapWithSource.getSource("parcel")?.setData(parcelFeature(geometry));
-          mapWithSource.fitBounds(bounds, { padding: 44, maxZoom: 18 });
+          instance.fitBounds(bounds, parcelCameraOptions(container.current?.clientWidth ?? 760));
           setReady(true);
           updateOverlay();
         };

@@ -45,5 +45,5 @@ export function ParcelIntelligenceTeaser({ caseId }: { caseId: string }) {
   const [data, setData] = useState<ParcelIntelligence | null>(null);
   useEffect(() => { void fetch(`/api/cases/${encodeURIComponent(caseId)}/parcel-intelligence`).then((response) => response.ok ? response.json() as Promise<{ data: ParcelIntelligence }> : null).then((result) => setData(result?.data ?? null)).catch(() => setData(null)); }, [caseId]);
   const c = localizedParcelComparisonPresentation(locale);
-  return <article className="summary-card"><p className="eyebrow">{c.areaComparison}</p><h2>{data?.geometry ? c.sourcesAvailable : c.noMappedBoundary}</h2><p>{data?.geometry ? `${c.historical} / ${c.survey} / ${c.geometry}` : c.unavailable}</p><Link className="text-link" href={`/cases/${caseId}/parcel-intelligence`}>{c.areaComparison} →</Link></article>;
+  return <article className="summary-card"><p className="eyebrow">{c.areaComparison}</p><h2>{data?.geometry ? c.sourcesAvailable : c.noMappedBoundary}</h2><p>{data?.geometry ? `${c.historical} / ${c.survey} / ${c.geometry}` : c.unavailable}</p><Link className="compact-action" href={`/cases/${caseId}/parcel-intelligence`}>{c.areaComparison} →</Link></article>;
 }

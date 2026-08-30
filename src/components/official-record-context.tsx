@@ -173,7 +173,7 @@ export function OfficialRecordContext({
       {!item ? (
         <>
           <h2>{copy.none}</h2>
-          <Link className="text-link" href={`/cases/${caseId}/official-records`}>
+          <Link className="compact-action" href={`/cases/${caseId}/official-records`}>
             {copy.lookup} →
           </Link>
         </>
@@ -200,7 +200,7 @@ export function OfficialRecordContext({
               <dd>{item.provenance}</dd>
             </div>
           </dl>
-          <Link className="text-link" href={`/cases/${caseId}/official-records`}>
+          <Link className="compact-action" href={`/cases/${caseId}/official-records`}>
             {copy.lookup} →
           </Link>
         </>

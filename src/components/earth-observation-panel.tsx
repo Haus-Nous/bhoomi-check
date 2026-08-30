@@ -70,8 +70,8 @@ export function EarthObservationPanel({ caseId }: { caseId: string }) {
   return <EarthObservationContent insight={state.data} caseId={caseId} />;
 }
 
-export function EarthObservationTeaser({ caseId }: { caseId: string }) {
+export function EarthObservationTeaser({ caseId, compact = false }: { caseId: string; compact?: boolean }) {
   const { locale } = useLocale();
   const c = localizedEarthObservationPresentation(locale);
-  return <section className="earth-teaser" aria-labelledby="earth-teaser-title"><div><p className="eyebrow">{c.synthetic}</p><h2 id="earth-teaser-title">{c.teaserTitle}</h2><p>{c.teaserDetail}</p></div><Link className="button secondary" href={`/cases/${caseId}/earth-observation`}>{c.view}</Link></section>;
+  return <section className={`earth-teaser ${compact ? "compact" : ""}`} aria-labelledby="earth-teaser-title"><div><p className="eyebrow">{c.synthetic}</p><h2 id="earth-teaser-title">{c.teaserTitle}</h2><p>{c.teaserDetail}</p></div><Link className={compact ? "compact-action" : "button secondary"} href={`/cases/${caseId}/earth-observation`}>{c.view} {compact && <span aria-hidden>→</span>}</Link></section>;
 }

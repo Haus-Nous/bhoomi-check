@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createPublicBasemapStyle, isBackgroundTileFailure, parcelBounds, parcelFeature, parcelRings } from "@/components/parcel-map";
+import { createPublicBasemapStyle, isBackgroundTileFailure, parcelBounds, parcelCameraOptions, parcelFeature, parcelRings } from "@/components/parcel-map";
 import type { GeoJsonPolygon } from "@/types/geospatial";
 
 const geometry: GeoJsonPolygon = { type: "Polygon", coordinates: [[[0, 0], [0.000579, 0], [0.000579, 0.000579], [0, 0.000579], [0, 0]]] };
@@ -22,5 +22,10 @@ describe("parcel map data preparation", () => {
     expect(isBackgroundTileFailure({ sourceId: "openstreetmap", error: { name: "AbortError", message: "Request aborted" } })).toBe(false);
     expect(isBackgroundTileFailure({ sourceId: "openstreetmap", error: { message: "HTTP 403 Forbidden" } })).toBe(true);
     expect(isBackgroundTileFailure({ sourceId: "parcel", error: { message: "parcel data error" } })).toBe(false);
+  });
+
+  it("uses camera-only responsive framing that gives small synthetic parcels useful prominence", () => {
+    expect(parcelCameraOptions(360)).toEqual({ padding: 36, maxZoom: 20 });
+    expect(parcelCameraOptions(1440)).toEqual({ padding: 72, maxZoom: 20 });
   });
 });
