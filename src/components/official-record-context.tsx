@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { useLocale } from "@/components/locale-context";
+import { TraceabilityDetails } from "@/components/traceability-details";
 import {
   localizedOfficialRecordDocumentsPresentation,
   localizedOfficialRecordPresentation,
@@ -89,22 +90,13 @@ export function DocumentImportedRecords({
                 <dd>{summary.recordedArea}</dd>
               </div>
               <div>
-                <dt>{copy.provider}</dt>
-                <dd>{item.provider}</dd>
-              </div>
-              <div>
-                <dt>{copy.provenance}</dt>
-                <dd>{summary.provenance}</dd>
-              </div>
-              <div>
-                <dt>{documents.source}</dt>
-                <dd>{summary.source}</dd>
-              </div>
-              <div>
                 <dt>{documents.identity}</dt>
                 <dd>{summary.identityMatch}</dd>
               </div>
             </dl>
+            <TraceabilityDetails summary={documents.traceability}>
+              <dl className="traceability-list"><div><dt>{copy.provider}</dt><dd>{item.provider}</dd></div><div><dt>{copy.provenance}</dt><dd>{summary.provenance}</dd></div><div><dt>{documents.source}</dt><dd>{summary.source}</dd></div></dl>
+            </TraceabilityDetails>
             <Link className="button secondary" href={`/cases/${caseId}/official-records`}>
               {documents.view}
             </Link>
@@ -195,11 +187,8 @@ export function OfficialRecordContext({
                 {item.record.recordData.recordedAreaUnit}
               </dd>
             </div>
-            <div>
-              <dt>{copy.provenance}</dt>
-              <dd>{item.provenance}</dd>
-            </div>
           </dl>
+          <TraceabilityDetails summary={copy.traceability}><p className="micro"><strong>{copy.provenance}:</strong> {item.provenance} · {item.sourceReference}</p></TraceabilityDetails>
           <Link className="compact-action" href={`/cases/${caseId}/official-records`}>
             {copy.lookup} →
           </Link>

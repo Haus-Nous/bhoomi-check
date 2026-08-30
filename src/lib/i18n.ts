@@ -71,7 +71,48 @@ export function localizedPeopleCount(locale: Locale, count: number) {
   return count === 1 ? "1 person noted" : `${count} people noted`;
 }
 
-export function localizedOfficialRecordPresentation(locale: Locale) { const hi = locale === "hi"; return { title: hi ? "आधिकारिक रिकॉर्ड खोज" : "Official record lookup", subtitle: hi ? "सभी परिणाम कृत्रिम हैं; कोई लाइव सरकारी रिकॉर्ड नहीं खोजा जाता।" : "All results are synthetic; no live government records are searched.", search: hi ? "कृत्रिम रिकॉर्ड खोजें" : "Search synthetic records", synthetic: hi ? "कृत्रिम आधिकारिक-शैली रिकॉर्ड" : "Synthetic official-style record", loading: hi ? "खोज रहे हैं…" : "Searching…", noMatch: hi ? "इन पहचानों से कोई कृत्रिम रिकॉर्ड मेल नहीं खाता।" : "No synthetic fixture matches these identifiers.", multiple: hi ? "एक से अधिक कृत्रिम रिकॉर्ड मिले।" : "Multiple synthetic records found.", import: hi ? "मामले में जोड़ें" : "Import into case", added: hi ? "रिकॉर्ड मामले में जोड़ा गया।" : "Record added to case.", linked: hi ? "रिकॉर्ड पहले से इस मामले से जुड़ा है।" : "Record already linked to this case.", mismatch: hi ? "यह रिकॉर्ड इस केस की पहचान से मेल नहीं खाता।" : "This record does not match this case identity.", safety: hi ? "यह सरकारी रिकॉर्ड नहीं बदलता, कुछ जमा नहीं करता, स्वामित्व नहीं बदलता और मौजूदा दस्तावेज़ नहीं बदलता।" : "It does not modify government records, submit anything, change ownership, or replace existing documents.", context: hi ? "आधिकारिक-शैली रिकॉर्ड संदर्भ" : "Official-style record context", none: hi ? "कोई कृत्रिम आधिकारिक-शैली रिकॉर्ड लिंक नहीं है।" : "No synthetic official-style record has been linked.", area: hi ? "दर्ज क्षेत्रफल" : "Recorded area", provider: hi ? "प्रदाता" : "Provider", provenance: hi ? "उत्पत्ति" : "Provenance", lookup: hi ? "रिकॉर्ड खोजें" : "Search records" }; }
+export function localizedExperiencePresentation(locale: Locale) {
+  const hi = locale === "hi";
+  return {
+    traceability: hi ? "ट्रेसबिलिटी और स्रोत विवरण" : "Traceability and source details",
+    documents: {
+      evidence: hi ? "केस साक्ष्य" : "Case evidence",
+      core: hi ? "मुख्य रिकॉर्ड" : "Core records",
+      coreDetail: hi ? "इस केस की तुलना और तैयारी में उपयोग होने वाले सिंथेटिक रिकॉर्ड।" : "Synthetic records used to compare and prepare this case.",
+      supporting: hi ? "सहायक सामग्री" : "Supporting material",
+      supportingDetail: hi ? "ये वैकल्पिक सिंथेटिक फिक्स्चर हैं; इन्हें मुख्य रिकॉर्ड के साथ न मिलाएं।" : "These optional synthetic fixtures are separate from the core records.",
+      addSupporting: hi ? "सहायक सिंथेटिक रिकॉर्ड जोड़ें" : "Add supporting synthetic records",
+      safety: hi ? "सभी रिकॉर्ड सिंथेटिक डेमो साक्ष्य हैं — ये आधिकारिक या कानूनी रिकॉर्ड नहीं हैं।" : "All records are synthetic demo evidence — not official or legal records.",
+      reviewVerification: hi ? "रिकॉर्ड जाँचें देखें" : "Review verification",
+      extractionTraceability: hi ? "निष्कर्षण ट्रेसबिलिटी" : "Extraction traceability",
+      sourceRecord: hi ? "स्रोत रिकॉर्ड विवरण" : "Source record details",
+    },
+    landing: {
+      eyebrow: hi ? "खंडित रिकॉर्ड से स्पष्ट तैयारी तक" : "From fragmented records to a clear preparation path",
+      title: hi ? "काम करने वाला साक्ष्य-आधारित डेमो" : "A working evidence-led demo",
+      document: hi ? "दस्तावेज़ साक्ष्य" : "Document evidence",
+      documentDetail: hi ? "सिंथेटिक भूमि रिकॉर्ड व्यवस्थित करें और देखें।" : "Organize and inspect synthetic land records.",
+      verification: hi ? "निर्धारित जाँच" : "Deterministic verification",
+      verificationDetail: hi ? "AI के कानूनी निर्णय के बिना रिकॉर्ड तथ्यों की तुलना करें।" : "Compare record facts without AI making legal judgments.",
+      parcel: hi ? "भू-खंड जानकारी" : "Parcel intelligence",
+      parcelDetail: hi ? "ऐतिहासिक, सर्वे और मानचित्रित क्षेत्रफलों की तुलना करें।" : "Compare historical, survey, and mapped areas.",
+      guidance: hi ? "मार्गदर्शित तैयारी" : "Guided preparation",
+      guidanceDetail: hi ? "कुछ जमा किए बिना अगली समीक्षा समझें।" : "Understand what to review next without submitting anything.",
+      demoEvidence: hi ? "डेमो साक्ष्य" : "Demo evidence",
+      historical: hi ? "ऐतिहासिक" : "Historical",
+      survey: hi ? "सर्वे" : "Survey",
+      mapped: hi ? "मानचित्रित" : "Mapped",
+      result: hi ? "परिणाम" : "Result",
+      resultValue: hi ? "ऐतिहासिक क्षेत्रफल में संभावित अंतर" : "Possible historical-area difference",
+    },
+    parcel: {
+      safety: hi ? "कृत्रिम भू-सीमा — केवल संदर्भ के लिए, आधिकारिक भू-अभिलेख साक्ष्य नहीं।" : "Synthetic parcel boundary — contextual only, not official cadastral evidence.",
+      traceability: hi ? "ज्यामिति ट्रेसबिलिटी" : "Geometry traceability",
+    },
+  };
+}
+
+export function localizedOfficialRecordPresentation(locale: Locale) { const hi = locale === "hi"; return { title: hi ? "आधिकारिक रिकॉर्ड खोज" : "Official record lookup", subtitle: hi ? "सभी परिणाम कृत्रिम हैं; कोई लाइव सरकारी रिकॉर्ड नहीं खोजा जाता।" : "All results are synthetic; no live government records are searched.", search: hi ? "कृत्रिम रिकॉर्ड खोजें" : "Search synthetic records", synthetic: hi ? "कृत्रिम आधिकारिक-शैली रिकॉर्ड" : "Synthetic official-style record", loading: hi ? "खोज रहे हैं…" : "Searching…", noMatch: hi ? "इन पहचानों से कोई कृत्रिम रिकॉर्ड मेल नहीं खाता।" : "No synthetic fixture matches these identifiers.", multiple: hi ? "एक से अधिक कृत्रिम रिकॉर्ड मिले।" : "Multiple synthetic records found.", import: hi ? "मामले में जोड़ें" : "Import into case", added: hi ? "रिकॉर्ड मामले में जोड़ा गया।" : "Record added to case.", linked: hi ? "रिकॉर्ड पहले से इस मामले से जुड़ा है।" : "Record already linked to this case.", mismatch: hi ? "यह रिकॉर्ड इस केस की पहचान से मेल नहीं खाता।" : "This record does not match this case identity.", safety: hi ? "यह सरकारी रिकॉर्ड नहीं बदलता, कुछ जमा नहीं करता, स्वामित्व नहीं बदलता और मौजूदा दस्तावेज़ नहीं बदलता।" : "It does not modify government records, submit anything, change ownership, or replace existing documents.", context: hi ? "आधिकारिक-शैली रिकॉर्ड संदर्भ" : "Official-style record context", none: hi ? "कोई कृत्रिम आधिकारिक-शैली रिकॉर्ड लिंक नहीं है।" : "No synthetic official-style record has been linked.", area: hi ? "दर्ज क्षेत्रफल" : "Recorded area", provider: hi ? "प्रदाता" : "Provider", provenance: hi ? "उत्पत्ति" : "Provenance", traceability: hi ? "ट्रेसबिलिटी और स्रोत विवरण" : "Traceability and source details", lookup: hi ? "रिकॉर्ड खोजें" : "Search records" }; }
 
 export function localizedOfficialRecordInspectionPresentation(locale: Locale) {
   const hi = locale === "hi";
@@ -87,6 +128,7 @@ export function localizedOfficialRecordInspectionPresentation(locale: Locale) {
     surveyStage: hi ? "सर्वे चरण" : "Survey stage",
     remarks: hi ? "टिप्पणियां" : "Remarks",
     source: hi ? "स्रोत संदर्भ" : "Source reference",
+    traceability: hi ? "ट्रेसबिलिटी और स्रोत विवरण" : "Traceability and source details",
     identity: hi ? "पहचान मिलान" : "Identity match",
     authority: hi ? "प्राधिकार स्थिति" : "Authority status",
     notAuthoritative: hi ? "यह कृत्रिम रिकॉर्ड आधिकारिक नहीं है।" : "This synthetic record is not authoritative.",
@@ -105,6 +147,7 @@ export function localizedOfficialRecordDocumentsPresentation(locale: Locale) {
   const hi = locale === "hi";
   return {
     title: hi ? "आयात किए गए रिकॉर्ड" : "Imported records",
+    traceability: hi ? "ट्रेसबिलिटी और स्रोत विवरण" : "Traceability and source details",
     loading: hi ? "आयात किए गए रिकॉर्ड लोड हो रहे हैं…" : "Loading imported records…",
     unavailable: hi ? "आयात किए गए रिकॉर्ड अभी नहीं दिखाए जा सके। कृपया फिर कोशिश करें।" : "Imported records could not be shown right now. Please try again.",
     view: hi ? "रिकॉर्ड देखें" : "View record",

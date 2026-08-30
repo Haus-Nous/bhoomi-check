@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { EmptyState, LoadingState } from "@/components/domain";
 import { useLocale } from "@/components/locale-context";
+import { TraceabilityDetails } from "@/components/traceability-details";
 import { localizedEarthObservationPresentation } from "@/lib/i18n";
 import type { EarthObservationClassification, EarthObservationIndicator, EarthObservationInsight, ImagerySnapshot } from "@/types/earth-observation";
 
@@ -51,11 +52,10 @@ function EarthObservationContent({ insight, caseId }: { insight: EarthObservatio
     <aside className="earth-safety" aria-labelledby="earth-safety-title"><strong id="earth-safety-title">{c.safetyTitle}</strong><p>{c.safetyDetail}</p></aside>
     {isInsufficient ? <EmptyState title={c.unavailableTitle} detail={c.unavailableDetail} /> : <>
       <section aria-label={c.synthetic}><div className="earth-snapshot-grid"><ContextImage snapshot={earlier!} label={c.earlier} syntheticLabel={c.synthetic} /><ContextImage snapshot={later!} label={c.later} syntheticLabel={c.synthetic} /></div></section>
-      <section className="earth-metadata" aria-label={c.traceability}><dl><div><dt>{c.provider}</dt><dd>{insight.provider}</dd></div><div><dt>{c.provenance}</dt><dd>{insight.provenance}</dd></div><div><dt>{c.quality}</dt><dd>{earlier?.quality}</dd></div><div><dt>{c.source}</dt><dd>{earlier?.assetReference} · {later?.assetReference}</dd></div></dl></section>
+      <TraceabilityDetails summary={c.traceability} className="earth-metadata"><dl><div><dt>{c.provider}</dt><dd>{insight.provider}</dd></div><div><dt>{c.provenance}</dt><dd>{insight.provenance}</dd></div><div><dt>{c.quality}</dt><dd>{earlier?.quality}</dd></div><div><dt>{c.source}</dt><dd>{earlier?.assetReference} · {later?.assetReference}</dd></div></dl><p>{c.traceabilityDetail}</p><p className="micro">{insight.policy.id} · ±{insight.policy.stableThresholdPercentagePoints} pp {c.stable} · &gt;{insight.policy.noticeableThresholdPercentagePoints} pp {c.noticeable}</p></TraceabilityDetails>
     </>}
     <section aria-labelledby="earth-indicators-title"><p className="eyebrow">{c.indicators}</p><h2 id="earth-indicators-title">{c.indicators}</h2><div className="earth-indicator-grid">{insight.indicators.map((item) => <IndicatorCard item={item} key={item.type} />)}</div></section>
     <aside className={`earth-summary ${statusClass(insight.overallClassification)}`} aria-labelledby="earth-summary-title"><p className="eyebrow">{c.overall}</p><h2 id="earth-summary-title">{insight.overallClassification === "STABLE" ? c.stable : insight.overallClassification === "SMALL_CHANGE" ? c.small : insight.overallClassification === "NOTICEABLE_CHANGE" ? c.noticeable : c.insufficient}</h2><p>{summary}</p></aside>
-    <details className="earth-traceability"><summary>{c.traceability}</summary><p>{c.traceabilityDetail}</p><p className="micro">{insight.policy.id} · ±{insight.policy.stableThresholdPercentagePoints} pp {c.stable} · &gt;{insight.policy.noticeableThresholdPercentagePoints} pp {c.noticeable}</p></details>
     <Link className="button secondary" href={`/cases/${caseId}/parcel-intelligence`}>{c.back}</Link>
   </div>;
 }

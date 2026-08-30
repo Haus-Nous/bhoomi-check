@@ -5,6 +5,7 @@ import { useState } from "react";
 import { CasePage } from "@/components/case-page";
 import { useLocale } from "@/components/locale-context";
 import { CaseHeader, CaseNavigation } from "@/components/shell";
+import { TraceabilityDetails } from "@/components/traceability-details";
 import {
   localizedOfficialRecordInspectionPresentation,
   localizedOfficialRecordPresentation,
@@ -297,18 +298,6 @@ function OfficialRecordsContent({
                   <dd>{record.recordData.remarks}</dd>
                 </div>
                 <div>
-                  <dt>{copy.provider}</dt>
-                  <dd>{record.sourceProvider}</dd>
-                </div>
-                <div>
-                  <dt>{copy.provenance}</dt>
-                  <dd>{record.provenance}</dd>
-                </div>
-                <div>
-                  <dt>{labels.source}</dt>
-                  <dd>{record.sourceReference}</dd>
-                </div>
-                <div>
                   <dt>{labels.identity}</dt>
                   <dd>{identityLabel}</dd>
                 </div>
@@ -317,6 +306,14 @@ function OfficialRecordsContent({
                   <dd>{labels.notAuthoritative}</dd>
                 </div>
               </dl>
+
+              <TraceabilityDetails summary={labels.traceability}>
+                <dl className="traceability-list">
+                  <div><dt>{copy.provider}</dt><dd>{record.sourceProvider}</dd></div>
+                  <div><dt>{copy.provenance}</dt><dd>{record.provenance}</dd></div>
+                  <div><dt>{labels.source}</dt><dd>{record.sourceReference}</dd></div>
+                </dl>
+              </TraceabilityDetails>
 
               <aside className="callout">
                 <strong>{copy.synthetic}</strong>
