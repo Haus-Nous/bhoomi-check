@@ -2,75 +2,198 @@
 
 **Understand your land record before you act.**
 
-BhoomiCheck is an independent AI-Rebuilder 2026 hackathon prototype for helping citizens make sense of a land-survey case before taking any outside action. It brings synthetic land records, family context, survey information, and possible record differences into one understandable case view.
+BhoomiCheck is a synthetic-first land-survey readiness assistant. It turns fragmented demo records into traceable evidence, deterministic verification, parcel intelligence, and practical next-step guidance—without presenting itself as a government service or making legal decisions.
 
-It is **not** a Government of Bihar product, does not connect to government systems, uses only fictional/synthetic data, and never determines legal ownership or submits anything.
+> **Independent prototype · Synthetic demo data only · Not legal advice or a government portal**
 
-## What a demo shows
+## Demo
 
-1. Create a synthetic `DEMO-...` land case.
-2. Add an approved bundled synthetic fixture.
-3. Inspect source text and optional AI-assisted candidate extraction.
-4. Compare available records using deterministic rules.
-5. Review source-linked potential issues or insufficient evidence.
-6. Follow preparation guidance and create a clearly labelled local review-packet draft.
-7. Open **Parcel map** to view a clearly synthetic mapped boundary, calculated geometry area, and contextual document/survey areas.
+There is no verified public demo URL in this repository. Run the local demo with `npm run dev`, then open [http://localhost:3000](http://localhost:3000).
 
-The hero case (`demo-family-001`) demonstrates an area mismatch and a family-context potential issue. Every verification result retains its source-document IDs and compared values.
+Start with [`demo-family-001`](http://localhost:3000/cases/demo-family-001), the guided hero case. The recommended flow is:
 
-## AI and verification
+```text
+Dashboard → Documents → Verification → Parcel Intelligence
+→ Official Records → Earth Observation → Next Action
+```
 
-AI extraction is optional and server-side. Set `AI_EXTRACTION_PROVIDER=gemini` (recommended for the demo) or `openai`; each proposes structured candidate facts only. Accepted facts require common schema validation, exact evidence spans, and deterministic semantic grounding. It does not decide a discrepancy, ownership, inheritance, or legal outcome.
+## The problem
 
-`VerificationService` makes deterministic area and family-context decisions. It returns `PASS`, `POTENTIAL_ISSUE`, or `INSUFFICIENT_EVIDENCE`; malformed or missing evidence is never turned into a discrepancy.
+Land-survey preparation can require a citizen to reconstruct one case from historical and current records, family or inheritance context, survey/Parcha information, parcel geometry, and supporting documents. The difficult question is often not where a form lives—it is what evidence exists, what agrees, what needs review, and what to prepare next.
 
-Synthetic parcel GeoJSON is validated and its area is calculated deterministically. It is contextual only: it is not an official cadastral boundary and does not change verification outcomes. See [geospatial notes](docs/GEOSPATIAL.md).
+BhoomiCheck does not attempt to replace the land-record system. It provides a citizen-side, synthetic demonstration of an evidence workflow that makes those questions easier to inspect.
 
-The citizen interface supports English and Hindi. Locale changes affect presentation only, never identifiers, evidence, citizen notes, or stored verification decisions.
+## The solution
 
-## Boundaries
+```text
+CASE
+  ↓
+DOCUMENTS
+  ↓
+STRUCTURED EXTRACTION
+  ↓
+DETERMINISTIC VERIFICATION
+  ↓
+PARCEL INTELLIGENCE
+  ↓
+CONTEXTUAL RECORD / EARTH OBSERVATION
+  ↓
+GUIDED NEXT ACTION
+```
 
-- All fixtures, people, identifiers, and documents are synthetic.
-- The enforced deployment profile is `synthetic-demo`: new cases require `DEMO-...` identifiers and clearly labelled synthetic/demo text; bundled fixtures are the only attachable records.
-- `MockGovernmentAdapter` is a local, deterministic boundary with no network behavior.
-- Review packets are local preparation aids, never submissions.
-- SQLite is a local prototype persistence adapter, not production infrastructure.
-- Authentication/session tenancy is not implemented; do not deploy this prototype as a shared case system.
+AI-assisted extraction may suggest structured facts from synthetic text. Deterministic code—not an LLM—compares identifiers and numerical facts, retains evidence references, and returns `PASS`, `POTENTIAL_ISSUE`, or `INSUFFICIENT_EVIDENCE`.
 
-Appropriate uses are local development, hackathon demonstrations, synthetic-data evaluation, and controlled demonstrations containing only synthetic records. It is not appropriate for real citizen records, sensitive land documents, legal/government workflow, or public multi-user storage.
+## Judge Quick Start
 
-## Run locally
+### Hero case: `demo-family-001`
+
+| Field | Synthetic value |
+| --- | --- |
+| District | Demo District |
+| Circle | Demo Circle |
+| Mauza | Example Mauza A |
+| Khata | `DEMO-128` |
+| Khesra | `DEMO-456` |
+| Historical/document area | 1.20 acre |
+| Survey/Parcha area | 1.02 acre |
+| Mapped geometry area | approximately 1.0243 acre |
+
+Expected story: the historical area differs materially from both the survey and the mapped synthetic boundary, while survey and geometry closely align. This is an evidence comparison—not a statement that any record is legally correct.
+
+### Control case: `demo-family-002`
+
+Open [`/cases/demo-family-002`](http://localhost:3000/cases/demo-family-002) to show the aligned control: `DEMO-902 / DEMO-114` has historical and survey areas of 1.25 acre and mapped synthetic geometry of approximately 1.2514 acre. All three parcel comparisons are consistent; area verification passes and family context correctly reports insufficient evidence rather than inventing a discrepancy.
+
+## Hero result: three traceable area perspectives
+
+| Comparison | Difference | Deterministic result |
+| --- | ---: | --- |
+| Historical ↔ Survey | 15.0000% | `POTENTIAL_ISSUE` |
+| Historical ↔ Geometry | approximately 14.6449% | `POTENTIAL_ISSUE` |
+| Survey ↔ Geometry | approximately 0.4160% | `CONSISTENT` |
+
+In plain language: the historical synthetic record differs from both the survey and mapped boundary; the survey and mapped geometry are closely aligned. BhoomiCheck never converts that pattern into an ownership, title, inheritance, or legal conclusion.
+
+## Key capabilities
+
+- Reconstruct a synthetic case around documents, family context, parcels, and a synthetic Khanapuri Parcha.
+- Organize evidence and inspect source text, extraction status, and traceability.
+- Use optional Gemini or OpenAI extraction behind shared schema, evidence-span, and semantic-grounding checks.
+- Run deterministic area and family-context verification with explicit insufficient-evidence outcomes.
+- Compare historical, survey/Parcha, and mapped-geometry areas through Parcel Intelligence.
+- Inspect synthetic official-style records through a provider boundary, without live government access.
+- View two-date synthetic Earth Observation context that is explicitly non-cadastral and non-legal.
+- Prepare a local MOCK review packet and receive one practical next step.
+- Use the interface in English or Hindi.
+
+## Why BhoomiCheck is different
+
+1. **Evidence-first, not chatbot-first.** Records and their sources lead the journey.
+2. **AI extracts; deterministic rules verify.** An LLM cannot decide a discrepancy or legal outcome.
+3. **Three independent parcel-area perspectives.** Historical/document, survey/Parcha, and mapped geometry are compared transparently.
+4. **Traceability is preserved.** Evidence, provider metadata, provenance, and source references are inspectable without overwhelming the citizen view.
+5. **Provider boundaries are honest.** Official-record and imagery boundaries demonstrate future integration patterns without claiming live access.
+6. **Context stays context.** Official-style records and Earth Observation do not become additional area sources or modify verification truth.
+7. **Missing facts stay uncertain.** `INSUFFICIENT_EVIDENCE` is preferred to fabricated certainty.
+8. **Synthetic-first by design.** The complete demo is safe to run without real land records or credentials.
+
+## Architecture
+
+![BhoomiCheck architecture and data flow](docs/architecture-diagram.svg)
+
+- Route-driven UI resolves a selected `CaseDetail` through `CaseService` and case-scoped API routes.
+- `CaseApplicationService` assembles the persisted aggregate; UI components do not read databases or fixtures directly.
+- SQLite is used locally; a server-side Postgres adapter is selected with `DATABASE_URL` for the hosted demo configuration.
+- Extraction uses an explicit provider selection: Gemini, OpenAI, or a safe unavailable state. Candidate facts must pass Zod/schema, evidence-span, and semantic-grounding checks.
+- `VerificationService` is deterministic and source-backed. It does not use an LLM to decide results.
+- Parcel Intelligence validates synthetic GeoJSON, calculates area with Turf, and compares exactly three evidence sources.
+- Official Record and Earth Observation services sit behind synthetic provider boundaries; neither changes verification or area-comparison truth.
+- Guidance and Review Packet services produce preparation artifacts only—never a government submission.
+
+See [architecture notes](docs/ARCHITECTURE.md), [API documentation](docs/API.md), and [data model](docs/DATA_MODEL.md).
+
+## Screenshots
+
+Clean image assets are intentionally not fabricated in this repository. See [the screenshot plan](docs/SCREENSHOT_PLAN.md) for six exact routes, viewport sizes, framing notes, and safe capture requirements. Parcel Intelligence is the strongest technical screenshot.
+
+## Synthetic evaluation proof
+
+The checked-in deterministic evaluation suite reports:
+
+| Measure | Result |
+| --- | ---: |
+| Test files | 41 |
+| Tests | 137 |
+| Synthetic cases | 12 |
+| Verification outcomes | 24 / 24 correct |
+| False positives / false negatives | 0 / 0 |
+| Insufficient-evidence outcomes | 5 / 5 |
+
+These figures apply only to the repository's synthetic evaluation suite. They are not claims about real land records, legal accuracy, live-model accuracy, or production performance. Run `npm run eval` to reproduce the reported verification result.
+
+## Safety and prototype boundary
+
+- BhoomiCheck is an independent prototype using fictional, synthetic demo data only.
+- It is not a Government of Bihar product or portal, does not retrieve live government records, and does not submit anything.
+- Synthetic official-style records are non-authoritative context, not legal evidence.
+- Earth Observation is synthetic contextual imagery, not cadastral or legal evidence.
+- The product does not determine ownership, inheritance rights, title, encroachment, or legal eligibility.
+- Review packets are local preparation aids, not claims, objections, or submissions.
+
+Read the full [safety and privacy boundary](docs/SAFETY.md).
+
+## Codex contribution
+
+Codex was used iteratively as an implementation and review agent across the phased build. The repository history records work on the case/service boundaries, extraction providers, deterministic verification, geospatial and parcel comparison, synthetic official-record and Earth Observation providers, persistence adapters, localization/accessibility, regression tests, and final UX QA. It supported the engineering process; the repository itself remains the source of truth for implemented behavior and limitations.
+
+## Tech stack
+
+- Next.js 16, React 19, TypeScript
+- Zod for structured validation
+- Node SQLite for local persistence; server-side Postgres/Supabase adapter for hosted configuration
+- MapLibre and OpenStreetMap raster basemap for synthetic parcel visualization
+- Turf area calculation for synthetic GeoJSON
+- Optional Gemini or OpenAI extraction providers
+- Vitest and ESLint for regression checks
+- Vercel-compatible Next.js deployment configuration
+
+## Local setup and deployment notes
+
+### Prerequisites
+
+- Node.js compatible with the checked-in Next.js configuration
+- npm
+
+### Install and run
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`. No AI-provider key is needed for case creation, fixture attachment, deterministic verification, tests, evaluation, or the build.
+Open `http://localhost:3000`. Local mode selects SQLite automatically when `DATABASE_URL` is unset. No AI key is required for case creation, the demo cases, document fixtures, deterministic verification, Parcel Intelligence, Earth Observation, tests, evaluation, or build.
 
-To enable optional live extraction only, select exactly one server-side provider:
+### Optional extraction provider
+
+Copy from `.env.example`; never commit credentials. Choose exactly one provider explicitly:
 
 ```bash
 AI_EXTRACTION_PROVIDER=gemini
-GEMINI_API_KEY=...
+GEMINI_API_KEY=server-only-key
 GEMINI_EXTRACTION_MODEL=gemini-2.5-flash
 ```
 
-## Demo
+or:
 
-1. Start the app and open `http://localhost:3000`.
-2. Select **Explore demo case** to enter Demo Case 001; no identifier entry is required.
-3. Open **Documents** and choose **Inspect fields** to read synthetic source text and quoted extraction evidence. Live extraction is optional: without a key for the explicitly selected provider, the rest of the demo continues and the extraction screen reports a safe unavailable state.
-4. Open **Survey record**, then **Check records**. The hero case shows `AREA_CONSISTENCY = POTENTIAL_ISSUE` and `FAMILY_CONTEXT = POTENTIAL_ISSUE`, each with source document IDs and compared values.
-5. Continue to **Next step**, prepare a local MOCK review packet, and show the **Timeline**.
-6. Return home and select **Reset demo case** to restore Demo Case 001 for another run. Reset is limited to the two bundled seed cases and never deletes a newly created case.
-7. To show the control, open `/cases/demo-family-002`. It returns `AREA_CONSISTENCY = PASS` and `FAMILY_CONTEXT = INSUFFICIENT_EVIDENCE`.
+```bash
+AI_EXTRACTION_PROVIDER=openai
+OPENAI_API_KEY=server-only-key
+OPENAI_EXTRACTION_MODEL=gpt-4.1-mini
+```
 
-## Deployment
+Without a selected/configured provider, extraction returns a safe unavailable state. It does not block the deterministic demo flow and does not automatically fall back to another provider.
 
-Local development uses Node SQLite. The hosted hackathon demo uses Vercel route handlers with server-side Supabase Postgres configured through `DATABASE_URL`. Supabase is database infrastructure only: this prototype does not implement Supabase Auth, browser database access, or production multi-user controls. Optional Gemini or OpenAI extraction is not required for the demo. See [deployment notes](docs/DEPLOYMENT.md).
-
-## Checks
+### Checks
 
 ```bash
 npm run typecheck
@@ -80,15 +203,16 @@ npm run eval
 npm run build
 ```
 
-`npm run eval` runs a 12-case, 24-rule-check synthetic benchmark against the production verification service. Its current result is 24/24 correct for that fixture set only; it is not a real-world, legal, or live-model accuracy claim.
+### Hosted demo configuration
 
-## Synthetic earth-observation context
+Hosted Vercel requests require server-side `DATABASE_URL` to select Postgres; Vercel without it fails safely rather than falling back to local SQLite. Run [`supabase/schema.sql`](supabase/schema.sql) in the configured Supabase project. This remains a synthetic demo—not a shared real-data system—and has no authentication, tenancy, or government integration. See [deployment notes](docs/DEPLOYMENT.md).
 
-Parcel Intelligence links to a two-date synthetic contextual-imagery view for the hero and control cases. The display is local and deterministic, requires no AI key or imagery provider credential, and is explicitly not cadastral or legal evidence. It never affects the three Phase 17 area sources, verification, or imported official-style records. See [Earth observation context](docs/EARTH_OBSERVATION.md).
-# Phase 17: synthetic parcel intelligence
+## Future scope
 
-The Parcel Intelligence page now makes the synthetic document, survey/Parcha, and mapped-geometry area story transparent. It uses deterministic acreage normalization and symmetric pairwise comparisons with clearly labelled demo-only tolerances; it does not use AI or make legal conclusions.
+Future work—not present in this prototype—could include lawful, documented government-record adapters; licensed/open Earth Observation providers; stronger OCR pipelines; human review workflows; expanded Bihar document schemas; auditable rule packs; and broader regional localization. Any real-data use would first require authentication, authorization, tenancy, privacy controls, retention policies, and a renewed safety review.
 
-## Synthetic official-record lookup
+## Submission materials
 
-Phase 18 demonstrates a future lawful integration through deterministic synthetic fixtures only. A citizen can search, inspect, identity-check, and idempotently link a synthetic official-style record to a case; Dashboard, Documents, and Parcel Intelligence show it as context. Every linked record preserves `SYNTHETIC_OFFICIAL_FIXTURE` provenance and `authoritative=false`. It never queries government systems, becomes an ordinary document, changes verification, or becomes a fourth Phase 17 area source.
+- [2–3 minute and 30-second demo scripts](docs/DEMO_SCRIPT.md)
+- [Hackathon submission copy](docs/SUBMISSION_COPY.md)
+- [Screenshot capture plan](docs/SCREENSHOT_PLAN.md)

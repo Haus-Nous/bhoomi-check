@@ -64,7 +64,7 @@ English and Hindi are presentation locales from one controlled copy structure. S
 - No Aadhaar, PAN, banking, or real private land-record data.
 - No legal ownership, title, inheritance, or filing determination.
 - No downloadable, printable, or official-looking packet export in the current prototype.
-- No authentication, session isolation, tenancy, production retention policy, or production deployment controls yet.
+- No authentication, session isolation, tenancy, production retention policy, or shared real-data deployment controls. A hosted synthetic demo can use the documented server-side Postgres adapter, but it is not a multi-user citizen-data system.
 
 ## Demo success criteria
 
