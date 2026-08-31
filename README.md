@@ -8,7 +8,7 @@ BhoomiCheck is a synthetic-first land-survey readiness assistant. It turns fragm
 
 ## Demo
 
-There is no verified public demo URL in this repository. Run the local demo with `npm run dev`, then open [http://localhost:3000](http://localhost:3000).
+Open the verified public demo at [bhoomi-check.vercel.app](https://bhoomi-check.vercel.app). For local development, run `npm run dev` and open [http://localhost:3000](http://localhost:3000).
 
 Start with [`demo-family-001`](http://localhost:3000/cases/demo-family-001), the guided hero case. The recommended flow is:
 

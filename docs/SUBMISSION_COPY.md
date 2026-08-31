@@ -86,4 +86,4 @@ Future work could add lawful, documented provider adapters; licensed/open imager
 
 ## Demo instructions
 
-Run `npm install && npm run dev`, then open `http://localhost:3000`. Begin with `demo-family-001` and follow Dashboard → Documents → Verification → Parcel Intelligence → Official Records → Earth Observation → Next Action. Use `demo-family-002` as the aligned control. No AI key is needed for the core demo.
+Open the verified public demo at [bhoomi-check.vercel.app](https://bhoomi-check.vercel.app), or run `npm install && npm run dev` locally and open `http://localhost:3000`. Begin with `demo-family-001` and follow Dashboard → Documents → Verification → Parcel Intelligence → Official Records → Earth Observation → Next Action. Use `demo-family-002` as the aligned control. No AI key is needed for the core demo.
